@@ -53,10 +53,10 @@ chmod +x setup.sh
 | -i	| The accession IDs that user needs| KARAJ downloads all of accession IDs | `KARAJ -i [SRR/SRP/PRJ/PRJNA]`
 | -d	| The list of PMCID(s) | KARAJ downloads all of file types | `KARAJ -l [URL(s)]`
 | -d	| Specefiy KARAJ downloads all files or selected files: (1): downloads the selected files, (0): downloads all files | KARAJ downloads all of files associated to the -l, -p, -f or -i flags| `KARAJ -d [1/0]`
-| -m	| Specefiy Karaj downloads metadata or not | empty | `KARAJ -l [URL(s)]`
-| -h	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
+| -m	| Specefiy KARAJ downloads metadata or not | empty | `KARAJ -m [URL(s)]?`
+| -h	| Help | empty | `KARAJ -h `
 | -u	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
-| -c	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
+| -c	| The number of threads| (the number of cores accessible in the system -1) | `KARAJ -c [core]`
 
 ------------------------------------------------------------------------------------------------------------------------
 
