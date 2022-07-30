@@ -62,7 +62,13 @@ chmod +x setup.sh
 ## Common Error messages
 
 | Error message | Description |
-| :--- | :--- | :--- | 
+| :--- | :--- | 
+| Invalid option, please see the Help using -h option | The error message states that you cannot use the KARAJ command with the determined flags. |
+|Argument missing from ID option|The error message states that you miss value after the argument ID.|
+|You missed one of the obligatory arguments|The error message states that all of the flags ( -p, -l, -f, -i) are empty. You need to run KARAJ command with one of these obligatory flags.|
+|You enter two obligatory flags with each other. Please enter one of these flags.|The error message states that you enter arguments of (-p, -l, -f) with each other. Karaj fetch and download one types of file in each run. |
+|No sample found. Either the provided ID is invalid or raw data was not provided for this record. | The error message states that raw data is not accessible with the one of IDs ( -p, -l, -f, -i) you enter. |
+| Directory does not have enough space for all files you aim to download. Please change the directory. |The error message states that there is no space in the working directory to download data.|
 
 
 ------------------------------------------------------------------------------------------------------------------------
