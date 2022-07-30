@@ -1,8 +1,9 @@
-KARAJ
-==================================
-![This is an image](![karaj](https://user-images.githubusercontent.com/12238056/181881439-41563d80-2585-4673-a5c5-dff1afad65f6.jpg)
-)
 
+<p align="center">
+  <img src="https://github.com/mahdieh1/KARAJ/blob/main/docs/karaj.jpg" />
+</p>
+
+========================================================================================================================================================================================
 
 ## A command-line software to streamline acquiring biological data
 
@@ -40,18 +41,17 @@ chmod +x setup.sh
 ## KARAJ analysis workflow
 
 
-
 ### Required Arguments
-| Flags | Description | Default | Syntax |
-| :---: | :---: | :---: | 
-| -l | The list of URL(s) | empty | KARAJ
-| -p	| The list of PMCID(s) | empty | 
-| -o	| The output working directory | The current working directory | 
-| -t	| Type of files: bam/vcf/fastq | all | 
-| -s	| Suplemenatry data (1/0) :  | empty | 
-| -p	| The list of PMCID(s) | empty | 
-| -p	| The list of PMCID(s) | empty | 
-| -p	| The list of PMCID(s) | empty | 
+| Flags | Description | Default | Syntax | 
+| :---: | :---: | :---: | :---: |  
+| -l | The list of URL(s) | empty | `KARAJ -l [URL1 URL2 URL3 ... URLn ]` 
+| -p	| The list of PMCID(s) | empty | `KARAJ -p [PMCID1 PMCID2 PMCID3 ... PMCIDn]`
+| -o	| The output working directory | The current working directory | `KARAJ -o [working directory]`
+| -t	| Type of files: bam/vcf/fastq | KARAJ downloads all of file types | `KARAJ -t [bam/vcf/fastq ]`
+| -s	| Suplemenatry data (1/0) :  | empty | `KARAJ -l [URL(s)]`
+| -p	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
+| -p	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
+| -p	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
 
 ------------------------------------------------------------------------------------------------------------------------
 
