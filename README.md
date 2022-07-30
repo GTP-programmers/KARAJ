@@ -41,7 +41,7 @@ chmod +x setup.sh
 ```
 ------------------------------------------------------------------------------------------------------------------------
 
-### Required Arguments
+### Required arguments
 
 | Flags | Description | Default | Syntax | 
 | :--- | :--- | :--- | :--- |  
