@@ -51,7 +51,6 @@ chmod +x setup.sh
 | -s	| Specify the Suplemenatry data is necessary to download or not  | 0 | `KARAJ -l [1/0]`
 | -f	| Specefiy file containing the URL(s) or PMCID(s) in the working direcory: For downloading: (1) URL(s): please use PMlist for the filename and 1 as the flag value with the file name (PMlist =1) and (Links = 0)   (2) PMCID(s): please use Links for the filename and 0 as the flag value with the file name (PMlist =1) and (Links = 0)   | KARAJ downloads based on the -l, -p or -i flags | `KARAJ -f [1/0]`
 | -i	| The accession IDs that user needs| KARAJ downloads all of accession IDs | `KARAJ -i [SRR/SRP/PRJ/PRJNA]`
-| -d	| The list of PMCID(s) | KARAJ downloads all of file types | `KARAJ -l [URL(s)]`
 | -d	| Specefiy KARAJ downloads all files or selected files: (1): downloads the selected files, (0): downloads all files | KARAJ downloads all of files associated to the -l, -p, -f or -i flags| `KARAJ -d [1/0]`
 | -m	| Specefiy KARAJ downloads metadata or not | empty | `KARAJ -m [URL(s)]?`
 | -h	| Help | empty | `KARAJ -h `
@@ -60,54 +59,19 @@ chmod +x setup.sh
 
 ------------------------------------------------------------------------------------------------------------------------
 
-## Required Arguments
+
 
 
 ------------------------------------------------------------------------------------------------------------------------
 
 ## How to use
 
-By default, PeakCNV runs in the current working directory unless specified by the user. By default, results will be saved in the working directory.  In clustering step, for each chromosome, PeakCNV asks you the eps value based on the k nearest neighbors(knn) plot. The optimal value is an elbow, where a sharp change in the distance occurs. For more information about results see the https://mahdieh1.github.io/PeakCNV/.
+Before using KARAJ, you need to run make file with the following commands:
+
 ```
-library("PeakCNV")
-PeakCNV()
+./makebash.sh
+
 ```
-Download the test data sets from https://github.com/mahdieh1/PeakCNV/tree/main/test-data into your working directory. For this datasets, P-value i
-
-#### Input files ####
-1. Case CNVs (case.bed):
-
-| Chr | Start | End | Sample-Id |
-| :---: | :---: | :---: | :---: |
-| 1 | 6742281 | 6742903 | SP7890 |
-
-2. Control CNVs (control.bed):
-
-| Chr | Start | End | Sample-Id |
-| :---: | :---: | :---: | :---: |
-| 1 | 6742281 | 6742903 | sa321 |
-
-Please put input files (case.bed and control.bed) in the working directory. If your CNV list contains chr X or Y, please replace them with 23,24.
-
-#### Output files: ####
-
-1. CNVRs (CNVRs.bed):
-
-| Chr | Start | End | 
-| :---: | :---: | :---: |
-| 1 | 6742281 | 6742903 | 
-
-2. clustered CNVRs (clustering.txt):
-
-| Chr | Start | End | #case | Cluster-NO |
-| :---: | :---: | :---: | :---: | :---: |  
-| 1 | 6742281 | 6742903 | 15 | 1 |
-
-3. Selected CNVRs (selection.txt)
-
-| Score | #chr | Start | End | #case | Cluster-NO | 
-| :---: | :---: | :---: | :---: | :---: | :---: | 
-| 56 | 21 | 6742281 | 6742903 | 15 |	225.86 | 0 |
 
 ------------------------------------------------------------------------------------------------------------------------
 
