@@ -38,8 +38,6 @@ Alternatively, the package may downloaded from apt:
 ------------------------------------------------------------------------------------------------------------------------
 
 ## Required Arguments
-
-
 | Argument | Description | Default |
 | :---: | :---: | :---: | 
 | -l | The list of URL(s) | empty |
