@@ -16,7 +16,9 @@ We here developed KARAJ a fast and flexible command-line software for Linux that
 
 - [Installation](#installation)
 - [KARAJ analysis workflow](#KARAJ-analysis-workflow)
-- [Arguments](#arguments)
+- [Required arguments](#Required-arguments)
+- [Common Error messages](#Common-Error-messages)
+- [Examples](#Examples)
 - [How to use](#how-to-use)
 - [Reference](#reference)
 - [Author Info](#author-info)
@@ -38,10 +40,8 @@ chmod +x setup.sh
 ```
 ------------------------------------------------------------------------------------------------------------------------
 
-## KARAJ analysis workflow
-
-
 ### Required Arguments
+
 | Flags | Description | Default | Syntax | 
 | :--- | :--- | :--- | :--- |  
 | -l | The list of URL(s) | empty | `KARAJ -l [URL1 URL2 URL3 ... URLn ]` 
@@ -58,7 +58,15 @@ chmod +x setup.sh
 | -c	| The number of threads| (the number of cores accessible in the system -1) | `KARAJ -c [core]`
 
 ------------------------------------------------------------------------------------------------------------------------
+## Common Error messages
 
+| Error message | Description |
+| :--- | :--- | :--- | :--- |  
+
+------------------------------------------------------------------------------------------------------------------------
+## Examples
+
+------------------------------------------------------------------------------------------------------------------------
 ## How to use
 
 Before using KARAJ, you need to run make file with the following commands:
