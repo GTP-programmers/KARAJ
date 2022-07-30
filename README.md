@@ -43,15 +43,20 @@ chmod +x setup.sh
 
 ### Required Arguments
 | Flags | Description | Default | Syntax | 
-| :---: | :---: | :---: | :---: |  
+| :--- | :--- | :--- | :--- |  
 | -l | The list of URL(s) | empty | `KARAJ -l [URL1 URL2 URL3 ... URLn ]` 
 | -p	| The list of PMCID(s) | empty | `KARAJ -p [PMCID1 PMCID2 PMCID3 ... PMCIDn]`
 | -o	| The output working directory | The current working directory | `KARAJ -o [working directory]`
-| -t	| Type of files: bam/vcf/fastq | KARAJ downloads all of file types | `KARAJ -t [bam/vcf/fastq ]`
-| -s	| Suplemenatry data (1/0) :  | empty | `KARAJ -l [URL(s)]`
-| -p	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
-| -p	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
-| -p	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
+| -t	| Type of files that user needs | KARAJ downloads all of file types | `KARAJ -t [bam/vcf/fastq ]`
+| -s	| Specify the Suplemenatry data is necessary to download or not  | 0 | `KARAJ -l [1/0]`
+| -f	| Specefiy file containing the URL(s) or PMCID(s) in the working direcory: For downloading: (1) URL(s): please use PMlist for the filename and 1 as the flag value with the file name (PMlist =1) and (Links = 0)   (2) PMCID(s): please use Links for the filename and 0 as the flag value with the file name (PMlist =1) and (Links = 0)   | KARAJ downloads based on the -l, -p or -i flags | `KARAJ -f [1/0]`
+| -i	| The accession IDs that user needs| KARAJ downloads all of accession IDs | `KARAJ -i [SRR/SRP/PRJ/PRJNA]`
+| -d	| The list of PMCID(s) | KARAJ downloads all of file types | `KARAJ -l [URL(s)]`
+| -d	| Specefiy KARAJ downloads all files or selected files: (1): downloads the selected files, (0): downloads all files | KARAJ downloads all of files associated to the -l, -p, -f or -i flags| `KARAJ -d [1/0]`
+| -m	| Specefiy Karaj downloads metadata or not | empty | `KARAJ -l [URL(s)]`
+| -h	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
+| -u	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
+| -c	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -117,8 +122,9 @@ Please consider citing the follow paper when you use this code.
 
 ## Contacts
 
-I will be pleased to address any question or concern about the PeakCNV package:
-In case of queries, please email: mahdieh.labani@students.mq.edu.au
+I will be pleased to address any question or concern about the KARAJ package:
+In case of queries, please email: m.labani@unsw.edu.au or a.afrasiabi@unsw.edu.au
+
 
 ------------------------------------------------------------------------------------------------------------------------
 
