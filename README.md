@@ -33,11 +33,12 @@ chmod +x setup.sh
 ```
 Alternatively, the package may downloaded from apt:
 ```
+## KARAJ analysis workflow
 
 ------------------------------------------------------------------------------------------------------------------------
 
-## KARAJ analysis workflow
 ## Required Arguments
+
 
 | Argument | Description | Default |
 | :---: | :---: | :---: | 
