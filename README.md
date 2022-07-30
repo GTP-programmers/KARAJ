@@ -3,7 +3,7 @@
   <img src="https://github.com/mahdieh1/KARAJ/blob/main/docs/karaj.jpg" />
 </p>
 
-========================================================================================================================================================================================
+=============================================================================================================================================================
 
 ## A command-line software to streamline acquiring biological data
 
@@ -17,13 +17,13 @@ We here developed KARAJ a fast and flexible command-line software for Linux that
 ## Table of Contents
 
 - [Installation](#installation)
-- [Required arguments](#Required-arguments)
-- [Common Error messages](#Common-Error-messages)
-- [Examples](#Examples)
+- [Required arguments](#required-arguments)
+- [Common Error messages](#common-error-messages)
+- [Examples](#examples)
 - [How to use](#how-to-use)
 - [Reference](#reference)
 - [Author Info](#author-info)
-- [Acknowledgements](#Acknowledgements)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -99,6 +99,7 @@ In case of queries, please email: m.labani@unsw.edu.au or a.afrasiabi@unsw.edu.a
 
 ------------------------------------------------------------------------------------------------------------------------
 
+## Author Info
 ### People who contributed to the KARAJ idea and code:
 * Mahdieh Labani 
 * Ali Afrasiabi
