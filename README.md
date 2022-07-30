@@ -37,12 +37,7 @@ Alternatively, the package may downloaded from apt:
 ------------------------------------------------------------------------------------------------------------------------
 
 ## KARAJ analysis workflow
-
-
-------------------------------------------------------------------------------------------------------------------------
-
-## Arguments
-Required
+## Required Arguments
 
 | Argument | Description | Default |
 | :---: | :---: | :---: | 
@@ -54,8 +49,14 @@ Required
 | -p	| The list of PMCID(s) | empty | 
 | -p	| The list of PMCID(s) | empty | 
 | -p	| The list of PMCID(s) | empty | 
-•	-l 
+
 ------------------------------------------------------------------------------------------------------------------------
+
+## Required Arguments
+
+
+------------------------------------------------------------------------------------------------------------------------
+
 ## How to use
 
 By default, PeakCNV runs in the current working directory unless specified by the user. By default, results will be saved in the working directory.  In clustering step, for each chromosome, PeakCNV asks you the eps value based on the k nearest neighbors(knn) plot. The optimal value is an elbow, where a sharp change in the distance occurs. For more information about results see the https://mahdieh1.github.io/PeakCNV/.
