@@ -75,6 +75,15 @@ chmod +x setup.sh
 ## Examples
 
 ```
+1. Command for downloading BAM files:
+$ ./KARAJ.sh -p PMC6197289 -t bam  
+
+2. Command for downloading VCF files:
+$ ./KARAJ.sh -l https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4750478/ -t vcf  
+
+3. Command for downloading FASTQ files:
+$ ./KARAJ.sh -i PRJNA521732 -t fastq
+
 
 ```
 ------------------------------------------------------------------------------------------------------------------------
