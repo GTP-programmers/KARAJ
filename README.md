@@ -20,7 +20,6 @@ We here developed KARAJ a fast and flexible Linux command-line tool to automate 
 - [Required arguments](#required-arguments)
 - [Common Error messages](#common-error-messages)
 - [Examples](#examples)
-- [How to use](#how-to-use)
 - [Reference](#reference)
 - [Author Info](#author-info)
 - [Acknowledgements](#acknowledgements)
@@ -77,27 +76,54 @@ chmod 777 KARAJ.sh
 ## Examples
 
 ```
-1. Command for downloading BAM files:
-$ ./KARAJ.sh -p PMC6197289 -t bam  
+1. Command for downloading one accession number:
+$ ./KARAJ.sh -i GSE126379 -s 0  
 
-2. Command for downloading VCF files:
-$ ./KARAJ.sh -l https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4750478/ -t vcf  
+2. Command for downloading more than one accession numbers:
+$ ./KARAJ.sh -i GSE126379 GSE92521 PRJNA427709 SRR10668798 GSE115469 -s 0
 
-3. Command for downloading FASTQ files:
-$ ./KARAJ.sh -i PRJNA521732 -t fastq
+3. Command for downloading a list of accession numbers:
+First make a text file in the working directory entitled “ACCESSIONS” containing the list of accession numbers. Then run the below command. 
+$ ./KARAJ.sh -f 1 -s 0
 
+4.Command for mining and downloading datasets in one article using PMCID:
+$ ./KARAJ.sh -p PMC6492329 -s 0
+
+5. Command for mining and downloading datasets in more than one articles using PMCID:
+$ ./KARAJ.sh -p PMC7182534 PMC6492329 PMC8000127 PMC6957475 PMC8455923 PMC8844275 PMC8426200 PMC7789210 -s 0
+
+6. Command for mining and downloading datasets in a list of articles using PMCID:
+First make a text file in the working directory entitled “PMCIDS” containing the list of article PMCIDs. Then run the below command. 
+$ ./KARAJ.sh -f 2 -s 0
+
+7. Command for mining and downloading datasets in one article using URL:
+$ ./KARAJ.sh -l https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6492329/ -s 0
+
+8. Command for mining and downloading datasets in more than one articles using article URL:
+$ ./KARAJ.sh -l https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6492329/ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7182534/ -s 0
+
+9. Command for mining and downloading datasets in a list of articles using article URLs:
+first make a text file in the working directory entitled “URLS” containing the list of article URLs. Then run the below command. 
+$ ./KARAJ.sh -f 3 -s 0
+
+10. Command for downloading supplementary files using article URL:
+$ ./KARAJ_V1.sh -l https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6492329/ -s 1
+
+11. Command for downloading supplementary files using article PMCID (please see the supplementary Supplementary figure 3):
+$ ./KARAJ.sh -p PMC6492329 -s 1
+
+12. Command for mining and downloading supplementary files for more than one articles using PMCID:
+$ ./KARAJ.sh -p PMC7182534 PMC6492329 PMC8000127 PMC6957475 PMC8455923 PMC8844275 PMC8426200 PMC7789210 -s 1
+
+13. Command for mining and downloading supplementary files for a list of articles using PMCID:
+First make a text file in the working directory entitled “PMCIDS” containing the list of article PMCIDs. Then run the below command. 
+$ ./KARAJ.sh -f 2 -s 1
+
+14. Command for mining and downloading supplementary files for a list of articles using article URLs:
+first make a text file in the working directory entitled “URLS” containing the list of article URLs. Then run the below command. 
+$ ./KARAJ.sh -f 3 -s 1
 
 ```
-------------------------------------------------------------------------------------------------------------------------
-## How to use
-
-Before using KARAJ, you need to run make file with the following commands:
-
-```
-./makebash.sh
-
-```
-
 ------------------------------------------------------------------------------------------------------------------------
 
 ## Reference
