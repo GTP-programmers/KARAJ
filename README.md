@@ -34,10 +34,12 @@ KARAJ runs on LINUX. Install the package from Github using the following command
 
 ```
 cd /KARAJ
-git clone https://github.com/Knowledge-Wisdom-Understanding/Auto-Recon.git
-cd Auto-Recon
-chmod +x setup.sh
-./setup.sh
+git clone https://github.com/Fringe-Lab/KARAJ.git
+cd KARAJ
+chmod 777 installation.sh
+./installation.sh
+chmod 777 KARAJ.sh
+
 ```
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -45,18 +47,18 @@ chmod +x setup.sh
 
 | Flags | Description | Default | Syntax | 
 | :--- | :--- | :--- | :--- |  
-| -l | The list of URL(s) | empty | `KARAJ -l [URL1 URL2 URL3 ... URLn ]` 
-| -p	| The list of PMCID(s) | empty | `KARAJ -p [PMCID1 PMCID2 PMCID3 ... PMCIDn]`
-| -o	| The output working directory | The current working directory | `KARAJ -o [working directory]`
-| -t	| Type of files that user needs | KARAJ downloads all of file types | `KARAJ -t [bam/vcf/fastq ]`
-| -s	| Specify the Suplemenatry data is necessary to download or not  | 0 | `KARAJ -l [1/0]`
-| -f	| Specefiy file containing the URL(s) or PMCID(s) or Seqlist(s) in the working direcory: For downloading: (1) URL(s): please use Links for the filename and 1 as the flag value with the file name (PMlist =1) or (Links = 2) or (seqlist = 3)  (2) PMCID(s): please use Links for the filename and 0 as the flag value with the file name (PMlist =1) and (Links = 0) (3) seqlist(s): please use Links for the filename and 0 as the flag value with the file name (PMlist =1) and (Links = 0)  | KARAJ downloads based on the -l, -p or -i flags | `KARAJ -f [1/0]`   | KARAJ downloads based on the -l, -p or -i flags | `KARAJ -f [1/2/3]`
-| -i	| The accession IDs that user needs| KARAJ downloads all of accession IDs | `KARAJ -i [SRR/SRP/PRJ/PRJNA]`
-| -d	| Specefiy KARAJ downloads all files or selected files: (1): downloads the selected files, (0): downloads all files | KARAJ downloads all of files associated to the -l, -p, -f or -i flags| `KARAJ -d [1/0]`
-| -m	| Specefiy KARAJ downloads metadata or not | empty | `KARAJ -m [URL(s)]?`
-| -h	| Help | empty | `KARAJ -h `
-| -u	| The list of PMCID(s) | empty | `KARAJ -l [URL(s)]`
-| -c	| The number of threads| (the number of cores accessible in the system -1) | `KARAJ -c [core]`
+| -l | Passing URL(s) | empty | `./KARAJ.sh -l [URL1 URL2 URL3 ... URLn ]` 
+| -p	| Passing PMCID(s) | empty | `./KARAJ.sh -p [PMCID1 PMCID2 PMCID3 ... PMCIDn]`
+| -o	| Output working directory | The current working directory | `./KARAJ.sh -o [directory/output]`
+| -t	| Specifying type of files formats | KARAJ downloads all of file types | `./KARAJ.sh -t [bam/vcf/fastq ]`
+| -s	| Downloading supplementary tables   | 0 | `./KARAJ.sh -s [1/0]`
+| -f	| Passing list of URL(s), PMCID(s) or accession number(s). Value 1 corresponds to a file named “PMCIDs” for passing a list of PMCIDs. Value 2 corresponds to a file named “ACCESSIONS” for passing a list of accession numbers.  Value 3 corresponds to a file named “URLS” for passing a list of URL(s). These files must be created in the working directory. Each line in either “PMCIDS”, “URLS” and “ACCESIONS” must contain only one entity.  | KARAJ downloads based on the -l, -p or -i flags | `./KARAJ.sh -f [1/0]`   | KARAJ downloads based on the -l, -p or -i flags | `./KARAJ.sh -f [1/2/3]`
+| -i	| Passing accession number(s) | KARAJ downloads all of accession IDs | `./KARAJ.sh -i [SRR/SRP/PRJ/PRJNA]`
+| -d	| Selecting accession number(s) to download. Value 1 corresponds to go to selection module before downloading files, (0): downloads all files. This option must be passed along with options -l, -p, -f or -i. | ./KARAJ.sh downloads all of files associated to the -l, -p, -f or -i flags| `./KARAJ.sh -d [1/0]`
+| -m	| Downloading metadata. This option must be passed along with options -l, -p, -f or -i. | empty | `./KARAJ.sh -m [0/1]`
+| -h	| Help | empty | `./KARAJ.sh -h `
+| -u	|Usage and examples | empty | `./KARAJ.sh -u]`
+| -c	| Number of cores | Number of accessible cores minus one | `./KARAJ.sh -c [core]`
 
 ------------------------------------------------------------------------------------------------------------------------
 ## Common Error messages
