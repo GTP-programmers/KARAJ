@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 ## this the installing function for KARAJ
 ## please run this sh file first to install all needed requirments to run KARAJ  
