@@ -36,6 +36,7 @@ wget https://github.com/Fringe-Lab/KARAJ/archive/refs/heads/main.zip
 unzip main.zip
 cd KARAJ-main/src
 chmod +x installation.sh
+./installation.sh
 chmod +x KARAJ.sh
 
 ```
