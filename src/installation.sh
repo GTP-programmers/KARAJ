@@ -190,12 +190,14 @@ for pkg in "${web_packages[@]}"; do
 		echo --------------------------------------------------------------------------
 		echo
 		cd
-		wget https://d3gcli72yxqn2z.cloudfront.net/downloads/connect/latest/bin/ibm-aspera-connect_4.2.2.135_linux.tar.gz	
-		tar -xvzf ibm-aspera-connect_4.2.2.135_linux.tar.gz
-		chmod +x ibm-aspera-connect_4.2.2.135_linux.sh
-		./ibm-aspera-connect_4.2.2.135_linux.sh
+		wget -qO- https://ak-delivery04-mul.dhe.ibm.com/sar/CMA/OSA/0a07f/0/ibm-aspera-connect_4.1.0.46-linux_x86_64.tar.gz | tar xvz
+		## run it
+		chmod +x ibm-aspera-connect_4.1.0.46-linux_x86_64.sh
+		./ibm-aspera-connect_4.1.0.46-linux_x86_64.sh
+		## add it to the path now and in the future
 		export PATH=$PATH:~/.aspera/connect/bin/
 		echo 'export PATH=$PATH:~/.aspera/connect/bin/' >> ~/.bash_profile
+		
 		TEMP=1
 		is_pkg_installed=$(~/."$pkg"/connect/bin/ascp --version 2>/dev/null | head -1 | grep -Eo "Aspera Connect version") 
 			if [[ "${is_pkg_installed}" == "Aspera Connect version" && "$TEMP" == "1" ]]; then
