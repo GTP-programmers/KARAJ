@@ -1,1 +1,67 @@
+./KARAJ.sh -p PMC7182534 PMC6492329 PMC8000127 PMC6957475 PMC8455923 PMC8844275 PMC8426200 PMC7789210 -s 0
+
+
+************************************* Output ************************************* 
+KARAJ v1.0 is ready to go.
+
+*******************************
+Output directory is not specified
+the current working directory  /mnt/d3/KARAJ/KARAJ-main/src  will be used as output directory
+*******************************
+
+There is no accession number in the text of PMC6957475
+
+There is no accession number in the text of PMC7789210
+
+There is no accession number in the text of PMC8426200
+
+There is no accession number in the text of PMC8455923
+
+There is no accession number in the text of PMC8844275
+
+summary report:
+
+1. GSE126379
+Overall experiment desgin: 5 individuals with paired CD19+ B cells and LCLs
+Description: Gene expression profiling of human  CD19+ B cells and EBV transformed lymphoblastoid cell lines (LCLs)
+Type: Illumina HiSeq 2500 (Homo sapiens)
+10 Samples
+##############################################
+2. GSE49628
+Overall experiment desgin: B-cells were isolated from 3 donors.  Resting, CD40 activated and EBV transfromed cells from each donor was analyzed.
+Description: Large-scale hypomethylated blocks associated with Epstein-Barr virus-induced B-cell immortalization [Expression Array]
+Type: [HG-U133_Plus_2] Affymetrix Human Genome U133 Plus 2.0 Array
+9 Samples
+##############################################
+
+##############################################
+GSE126379 GSE49628 specified to download
+##############################################
+
+
+feching specified dataset(s) from the database: 
+
+>>>>>>>                   [40%]
+
+error for GSE49628
+No sample found for GSE49628. Either the provided GSE49628 is invalid or raw data was not provided for this record
+>>>>>>>>>>>>>>>>>>>>>>>>>>[100%]
+
+local disk memory size checking: 
+
+
+------------------------------------------------------------------
+there is 985 GB space avialable in /mnt/d3/KARAJ/KARAJ-main/src
+GSE126379 size is 7.66 GB
+There is adequate space in /mnt/d3/KARAJ/KARAJ-main/src to download all specified files.
+------------------------------------------------------------------
+
+KARAJ is downloading files corresponding to the selected accession number(s)
+35 cores are using
+KARAJ is downloading GSE126379
+downloading GSE126379 is completed
+This run took 330 seconds
+
+************************************* End ************************************* 
+
 
