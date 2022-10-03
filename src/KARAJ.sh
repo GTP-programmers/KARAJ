@@ -242,10 +242,12 @@ fi
 if [[ -v Output ]];
 	then
 	    echo "*******************************"
-	    echo "Output directory you enter is:"
+	    echo "The specified output directory is:"
 	    echo $Output
 	    echo "*******************************"
 	    echo ""
+	    out=$Output
+	    cd $Output
 	else
 	    echo "*******************************"
 	    echo "Output directory is not specified"
@@ -253,6 +255,7 @@ if [[ -v Output ]];
 	    echo "*******************************"
 	    echo ""
 	    out=$PWD
+	    
 fi
 
 
@@ -261,10 +264,9 @@ if [[ -v PMCID ]];
 	then
 		for j in "${!PMCID[@]}"; do
 		l="https://www.ncbi.nlm.nih.gov/pmc/articles/${PMCID[j]}/"
-		#lynx -dump ${l} | grep -Eo "PMID: \[.*\][0-9]{1,20}" | sed -e 's/.*]//g' >> ListPMID
 		echo $l >> PMCIDlist
 		cat PMCIDlist | sort | uniq > tmp && mv tmp PMCIDlist
-		#cat ListPMID | sort | uniq > tmp1 && mv tmp1 ListPMID
+
         done 
 		## obtaining supplementary tables using PMCID
 		if [[ -v supp ]];
@@ -324,6 +326,7 @@ if [[ -v PMCID ]];
 				rm t3
 				rm t4
 				rm t5
+				rm PMID
 			touch list
 			M=$(cat list | wc -l)
 
@@ -356,6 +359,7 @@ if [[ -v PMCID ]];
 				 	rm file1.txt
 				 	rm file2.txt
 				 	rm list22
+				 	rm file.txt 2> /dev/null
 				 	rm tmp2 2> /dev/null
 				done
 	      		
@@ -383,13 +387,6 @@ if [[ -v PMCID ]];
 				exit 0
 		fi
 		mapfile lines < list	
-		
-				
-		
-		
-		
-		
-		
 		
 			
 ## generating metadata
@@ -561,6 +558,7 @@ if [[ -v meta ]];
 		fi
 fi		
 
+
 ## generating summary reports   
 		echo "summary report:"
 		echo ""
@@ -585,11 +583,7 @@ fi
 				cat tmp | grep "Type: " > tmp4
 				cat tmp | grep -Eo '[0-9]{1,10} Samples' | sed 's/^[ \t]*//' > tmp5
 				echo "##############################################" > tmp6
-				# write in txt file
-				#printf '%s\n' tmp1 B C | paste -sd ',' >> file.csv
-
 				cat tmp1 tmp2 tmp3 tmp4 tmp5 tmp6
-
 				rm tmp1
 				rm tmp2
 				rm tmp3
@@ -711,6 +705,7 @@ if [[ -v link ]];
 				 	rm file1.txt
 				 	rm file2.txt
 				 	rm list22
+				 	rm file.txt 2> /dev/null 
 				 	rm tmp2 2> /dev/null
 				done
 	
@@ -997,11 +992,7 @@ if [[ -v file ]];
 		for k in $(cat PMCIDlist);do
 			touch list
 			M=$(cat list | wc -l)
-			#for i in "${Types[@]}"; do
 
-			#	lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
-			
-			#done
 				touch info.txt
 		
 			printf '%s\n' ${k} > file.txt
@@ -1050,6 +1041,7 @@ if [[ -v file ]];
 				 	rm file1.txt
 				 	rm file2.txt
 				 	rm list22
+				 	rm file.txt 2> /dev/null 
 				 	rm tmp2 2> /dev/null
 				done
 			N=$(cat list | wc -l)
@@ -1397,13 +1389,7 @@ elif [[ $file == '2' ]];
 	
 	
 	Types=("GSE" "PRJNA" "ERP" "SRP")
-	#for k in $(cat PMCIDlist);do
-       #      touch list
-	#      M=$(cat list | wc -l)
-	#for i in "${Types[@]}"; do
 
-	#      lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
-	#done
 		touch info.txt
 		for k in $(cat PMCIDlist);do
 		
@@ -1453,6 +1439,7 @@ elif [[ $file == '2' ]];
 				 	rm file1.txt
 				 	rm file2.txt
 				 	rm list22
+				 	rm file.txt 2> /dev/null
 				 	rm tmp2 2> /dev/null
 				done
 	      N=$(cat list | wc -l)
@@ -1781,6 +1768,7 @@ elif [[ $file == '3' ]];
 				 	rm file1.txt
 				 	rm file2.txt
 				 	rm list22
+				 	rm file.txt 2> /dev/null 
 				 	rm tmp2 2> /dev/null
 				done
 	
@@ -2545,13 +2533,12 @@ if [[ -v core ]];
 		echo "This run took $duration seconds"
 fi
 	
-rm list 2> /dev/null
-rm list1 2> /dev/null
-rm PMCIDlist 2> /dev/null
-rm supp1 2> /dev/null
-rm lines 2> /dev/null
-rm tmp 2> /dev/null
+rm -rf list 2> /dev/null
+rm -rf list1 2> /dev/null
+rm -rf PMCIDlist 2> /dev/null
+rm -rf supp1 2> /dev/null
+rm -rf lines 2> /dev/null
+rm -rf tmp 2> /dev/null
 #######  END  #######
-
 
 
