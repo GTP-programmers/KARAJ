@@ -1,1 +1,44 @@
+./KARAJ.sh -p PMC6197289 -s 0
 
+
+************************************* Output ************************************* 
+
+KARAJ v1.0 is ready to go.
+
+*******************************
+The specified output directory is:
+/mnt/USER_DATA_6T
+*******************************
+
+summary report:
+
+1. GSE115469
+Overall experiment desgin: Primary liver samples from 5 patients were used for single cell RNA sequencing by 10X Genomics
+Description: Single-cell transcriptomic profiling of healthy and fibrotic adult zebrafish liver reveals conserved cell identities and pathways with human liver
+Type: Dissecting the human liver cellular landscape by single cell RNA-seq reveals novel intrahepatic monocyte/ macrophage populations
+6 Samples
+5 Samples
+##############################################
+
+##############################################
+GSE115469 specified to download
+##############################################
+
+
+feching specified dataset(s) from the database: 
+
+>>>>>>>                   [40%]
+>>>>>>>>>>>>>>>>>>>>>>>>>>[100%]
+
+local disk memory size checking: 
+
+
+---------------------------------------------------------------------------------------------------
+there is 132 GB space avialable in /mnt/USER_DATA_6T
+total size of sequence data for below accession number(s)
+GSE115469
+is 232.82 GB
+/mnt/USER_DATA_6T does not have enough space for all files you aim to download. Please change the directroy.
+---------------------------------------------------------------------------------------------------
+
+************************************* End ************************************* 
