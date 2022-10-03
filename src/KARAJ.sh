@@ -261,8 +261,10 @@ if [[ -v PMCID ]];
 	then
 		for j in "${!PMCID[@]}"; do
 		l="https://www.ncbi.nlm.nih.gov/pmc/articles/${PMCID[j]}/"
+		#lynx -dump ${l} | grep -Eo "PMID: \[.*\][0-9]{1,20}" | sed -e 's/.*]//g' >> ListPMID
 		echo $l >> PMCIDlist
 		cat PMCIDlist | sort | uniq > tmp && mv tmp PMCIDlist
+		#cat ListPMID | sort | uniq > tmp1 && mv tmp1 ListPMID
         done 
 		## obtaining supplementary tables using PMCID
 		if [[ -v supp ]];
@@ -305,17 +307,58 @@ if [[ -v PMCID ]];
 
 ## searching for different types of accession numbers in the text of articles that are obtained using genrated URL(s)   
 	Types=("GSE" "PRJNA" "ERP" "SRP")
-
+		touch info.txt
 		for k in $(cat PMCIDlist);do
-
+		
+			printf '%s\n' ${k} > file.txt
+				lynx -dump ${k} | grep -Eo "PMID: \[.*\][0-9]{1,20}" | sed -e 's/.*]//g' > PMID
+			   	PMID=$(cat PMID)
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^TI/,/^PG/{{ /^PG/! p } }' | sed "s|TI  - |      |g" | sed 's/^[ \t]*//' | tr '\n' ' ' > t2
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AB/,/^FAU /{{ /^FAU /! p } }' | sed "s|AB  - |      |g" | sed 's/^[ \t]*//' | grep -v "CI  - " | tr '\n' ' ' > t3
+				
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AU/,/^AD/{{ /^AD/! p } }' | sed "s|AU  - |      |g" | sed 's/^[ \t]*//' | grep -v "AUID- " | tr '\n' ';' > t4
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^PMID/,/^OWN/{{ /^OWN/! p } }' | sed "s|PMID- |PMID:|g" | sed 's/^[ \t]*//' > t5
+				
+				paste -d"|" t2 t3 t4 t5 > tmp2
+				rm t2
+				rm t3
+				rm t4
+				rm t5
 			touch list
 			M=$(cat list | wc -l)
 
 				for i in "${Types[@]}"; do
 					
 					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
-				
+					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq > list22
+				 	awk '
+						{ 
+						    for (i=1; i<=NF; i++)  {
+						        a[NR,i] = $i
+						    }
+						}
+						NF>p { p = NF }
+						END {    
+    						for(j=1; j<=p; j++) {
+						        str=a[1,j]
+						        for(i=2; i<=NR; i++){
+						            str=str" "a[i,j];
+						        }
+						        print str
+						    }
+						}' list22 > file1.txt
+					tr ' ' ';' < file1.txt > tmp1
+					mv tmp1 file1.txt
+					paste -d"|" file.txt file1.txt tmp2 > file2.txt 2> /dev/null
+				 	cat info.txt file2.txt >> tmp1 && mv tmp1 info.txt
+				 	cat info.txt | uniq > tmp1 && mv tmp1 info.txt
+				 	cat info.txt | awk -F'|' '{print $1" | ",$2" | ",$3" | ",$4" | ",$5" | ",$6}' > tmp1 && mv tmp1 info.txt
+				 	rm file1.txt
+				 	rm file2.txt
+				 	rm list22
+				 	rm tmp2 2> /dev/null
 				done
+	      		
 	      		N=$(cat list | wc -l)
 	      		
 	      			if [[ "${N}" == "${M}" ]];
@@ -330,6 +373,8 @@ if [[ -v PMCID ]];
      
      		done
      
+				
+     
 		if [[ -z $(cat list) ]];
 			then
 			
@@ -338,6 +383,14 @@ if [[ -v PMCID ]];
 				exit 0
 		fi
 		mapfile lines < list	
+		
+				
+		
+		
+		
+		
+		
+		
 			
 ## generating metadata
 if [[ -v meta ]]; 
@@ -532,7 +585,11 @@ fi
 				cat tmp | grep "Type: " > tmp4
 				cat tmp | grep -Eo '[0-9]{1,10} Samples' | sed 's/^[ \t]*//' > tmp5
 				echo "##############################################" > tmp6
+				# write in txt file
+				#printf '%s\n' tmp1 B C | paste -sd ',' >> file.csv
+
 				cat tmp1 tmp2 tmp3 tmp4 tmp5 tmp6
+
 				rm tmp1
 				rm tmp2
 				rm tmp3
@@ -541,7 +598,7 @@ fi
 				rm tmp6
 				rm tmp
 				rm -rf "${out}"/"${B}"/"${B}"_series_matrix.txt
-
+                
 			done
 						
 			echo ""
@@ -604,17 +661,61 @@ if [[ -v link ]];
 			fi
 		
 	Types=("GSE" "PRJNA" "ERP" "SRP")
+	
+		touch info.txt
 		for k in $(cat PMCIDlist);do
-			
+		
+			printf '%s\n' ${k} > file.txt
+				lynx -dump ${k} | grep -Eo "PMID: \[.*\][0-9]{1,20}" | sed -e 's/.*]//g' > PMID
+			   	PMID=$(cat PMID)
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^TI/,/^PG/{{ /^PG/! p } }' | sed "s|TI  - |      |g" | sed 's/^[ \t]*//' | tr '\n' ' ' > t2
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AB/,/^FAU /{{ /^FAU /! p } }' | sed "s|AB  - |      |g" | sed 's/^[ \t]*//' | grep -v "CI  - " | tr '\n' ' ' > t3
+				
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AU/,/^AD/{{ /^AD/! p } }' | sed "s|AU  - |      |g" | sed 's/^[ \t]*//' | grep -v "AUID- " | tr '\n' ';' > t4
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^PMID/,/^OWN/{{ /^OWN/! p } }' | sed "s|PMID- |PMID:|g" | sed 's/^[ \t]*//' > t5
+				
+				paste -d"|" t2 t3 t4 t5 > tmp2
+				rm t2
+				rm t3
+				rm t4
+				rm t5
 			touch list
 			M=$(cat list | wc -l)
 
 				for i in "${Types[@]}"; do
 					
 					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
-	
+					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq > list22
+				 	awk '
+						{ 
+						    for (i=1; i<=NF; i++)  {
+						        a[NR,i] = $i
+						    }
+						}
+						NF>p { p = NF }
+						END {    
+    						for(j=1; j<=p; j++) {
+						        str=a[1,j]
+						        for(i=2; i<=NR; i++){
+						            str=str" "a[i,j];
+						        }
+						        print str
+						    }
+						}' list22 > file1.txt
+					tr ' ' ';' < file1.txt > tmp1
+					mv tmp1 file1.txt
+					paste -d"|" file.txt file1.txt tmp2 > file2.txt 2> /dev/null
+				 	cat info.txt file2.txt >> tmp1 && mv tmp1 info.txt
+				 	cat info.txt | uniq > tmp1 && mv tmp1 info.txt
+				 	cat info.txt | awk -F'|' '{print $1" | ",$2" | ",$3" | ",$4" | ",$5" | ",$6}' > tmp1 && mv tmp1 info.txt
+				 	rm file1.txt
+				 	rm file2.txt
+				 	rm list22
+				 	rm tmp2 2> /dev/null
 				done
 	
+	
+		
 			N=$(cat list | wc -l)
 			
 			if [[ "${N}" == "${M}" ]];
@@ -849,7 +950,7 @@ if [[ -v file ]];
 	then
 		if [[ $file == '1' ]];
 			then
-
+				cp PMCID.txt PMCID
 				for j in $(cat "${out}"/PMCID);do
 					
 					l="https://www.ncbi.nlm.nih.gov/pmc/articles/${j}/"
@@ -896,11 +997,61 @@ if [[ -v file ]];
 		for k in $(cat PMCIDlist);do
 			touch list
 			M=$(cat list | wc -l)
-			for i in "${Types[@]}"; do
+			#for i in "${Types[@]}"; do
 
-				lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
+			#	lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
 			
-			done
+			#done
+				touch info.txt
+		
+			printf '%s\n' ${k} > file.txt
+				lynx -dump ${k} | grep -Eo "PMID: \[.*\][0-9]{1,20}" | sed -e 's/.*]//g' > PMID
+			   	PMID=$(cat PMID)
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^TI/,/^PG/{{ /^PG/! p } }' | sed "s|TI  - |      |g" | sed 's/^[ \t]*//' | tr '\n' ' ' > t2
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AB/,/^FAU /{{ /^FAU /! p } }' | sed "s|AB  - |      |g" | sed 's/^[ \t]*//' | grep -v "CI  - " | tr '\n' ' ' > t3
+				
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AU/,/^AD/{{ /^AD/! p } }' | sed "s|AU  - |      |g" | sed 's/^[ \t]*//' | grep -v "AUID- " | tr '\n' ';' > t4
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^PMID/,/^OWN/{{ /^OWN/! p } }' | sed "s|PMID- |PMID:|g" | sed 's/^[ \t]*//' > t5
+				
+				paste -d"|" t2 t3 t4 t5 > tmp2
+				rm t2
+				rm t3
+				rm t4
+				rm t5
+			touch list
+			M=$(cat list | wc -l)
+
+				for i in "${Types[@]}"; do
+					
+					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
+					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq > list22
+				 	awk '
+						{ 
+						    for (i=1; i<=NF; i++)  {
+						        a[NR,i] = $i
+						    }
+						}
+						NF>p { p = NF }
+						END {    
+    						for(j=1; j<=p; j++) {
+						        str=a[1,j]
+						        for(i=2; i<=NR; i++){
+						            str=str" "a[i,j];
+						        }
+						        print str
+						    }
+						}' list22 > file1.txt
+					tr ' ' ';' < file1.txt > tmp1
+					mv tmp1 file1.txt
+					paste -d"|" file.txt file1.txt tmp2 > file2.txt 2> /dev/null
+				 	cat info.txt file2.txt >> tmp1 && mv tmp1 info.txt
+				 	cat info.txt | uniq > tmp1 && mv tmp1 info.txt
+				 	cat info.txt | awk -F'|' '{print $1" | ",$2" | ",$3" | ",$4" | ",$5" | ",$6}' > tmp1 && mv tmp1 info.txt
+				 	rm file1.txt
+				 	rm file2.txt
+				 	rm list22
+				 	rm tmp2 2> /dev/null
+				done
 			N=$(cat list | wc -l)
 			if [[ "${N}" == "${M}" ]];
 				then
@@ -1137,7 +1288,7 @@ fi
 	
 elif [[ $file == '2' ]];
 	then
-	cp ACCESSIONS list1
+	cp ACCESSIONS.txt list1
         
     
 	## converting ERP to GSE
@@ -1246,13 +1397,64 @@ elif [[ $file == '2' ]];
 	
 	
 	Types=("GSE" "PRJNA" "ERP" "SRP")
-	for k in $(cat PMCIDlist);do
-              touch list
-	      M=$(cat list | wc -l)
-	for i in "${Types[@]}"; do
+	#for k in $(cat PMCIDlist);do
+       #      touch list
+	#      M=$(cat list | wc -l)
+	#for i in "${Types[@]}"; do
 
-	      lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
-	done
+	#      lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
+	#done
+		touch info.txt
+		for k in $(cat PMCIDlist);do
+		
+			printf '%s\n' ${k} > file.txt
+				lynx -dump ${k} | grep -Eo "PMID: \[.*\][0-9]{1,20}" | sed -e 's/.*]//g' > PMID
+			   	PMID=$(cat PMID)
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^TI/,/^PG/{{ /^PG/! p } }' | sed "s|TI  - |      |g" | sed 's/^[ \t]*//' | tr '\n' ' ' > t2
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AB/,/^FAU /{{ /^FAU /! p } }' | sed "s|AB  - |      |g" | sed 's/^[ \t]*//' | grep -v "CI  - " | tr '\n' ' ' > t3
+				
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AU/,/^AD/{{ /^AD/! p } }' | sed "s|AU  - |      |g" | sed 's/^[ \t]*//' | grep -v "AUID- " | tr '\n' ';' > t4
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^PMID/,/^OWN/{{ /^OWN/! p } }' | sed "s|PMID- |PMID:|g" | sed 's/^[ \t]*//' > t5
+				
+				paste -d"|" t2 t3 t4 t5 > tmp2
+				rm t2
+				rm t3
+				rm t4
+				rm t5
+			touch list
+			M=$(cat list | wc -l)
+
+				for i in "${Types[@]}"; do
+					
+					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
+					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq > list22
+				 	awk '
+						{ 
+						    for (i=1; i<=NF; i++)  {
+						        a[NR,i] = $i
+						    }
+						}
+						NF>p { p = NF }
+						END {    
+    						for(j=1; j<=p; j++) {
+						        str=a[1,j]
+						        for(i=2; i<=NR; i++){
+						            str=str" "a[i,j];
+						        }
+						        print str
+						    }
+						}' list22 > file1.txt
+					tr ' ' ';' < file1.txt > tmp1
+					mv tmp1 file1.txt
+					paste -d"|" file.txt file1.txt tmp2 > file2.txt 2> /dev/null
+				 	cat info.txt file2.txt >> tmp1 && mv tmp1 info.txt
+				 	cat info.txt | uniq > tmp1 && mv tmp1 info.txt
+				 	cat info.txt | awk -F'|' '{print $1" | ",$2" | ",$3" | ",$4" | ",$5" | ",$6}' > tmp1 && mv tmp1 info.txt
+				 	rm file1.txt
+				 	rm file2.txt
+				 	rm list22
+				 	rm tmp2 2> /dev/null
+				done
 	      N=$(cat list | wc -l)
 	      if [[ "${N}" == "${M}" ]];
 	      then
@@ -1491,8 +1693,8 @@ fi
 		
 elif [[ $file == '3' ]];
 	then
-	    cp URLS PMCIDlist
-	    cp URLS list1
+	    cp URLS.txt PMCIDlist
+	    cp URLS.txt list1
 	    
 		if [[ -v supp ]];
 		then
@@ -1529,14 +1731,70 @@ elif [[ $file == '3' ]];
 			
 		fi
 	Types=("GSE" "PRJNA" "ERP" "SRP")
-	for k in $(cat URLS);do
-		touch list
-		M=$(cat list | wc -l)
-		for i in "${Types[@]}"; do
+	
+		touch info.txt
+		for k in $(cat URLS);do
 		
-			lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
+			printf '%s\n' ${k} > file.txt
+				lynx -dump ${k} | grep -Eo "PMID: \[.*\][0-9]{1,20}" | sed -e 's/.*]//g' > PMID
+			   	PMID=$(cat PMID)
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^TI/,/^PG/{{ /^PG/! p } }' | sed "s|TI  - |      |g" | sed 's/^[ \t]*//' | tr '\n' ' ' > t2
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AB/,/^FAU /{{ /^FAU /! p } }' | sed "s|AB  - |      |g" | sed 's/^[ \t]*//' | grep -v "CI  - " | tr '\n' ' ' > t3
+				
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AU/,/^AD/{{ /^AD/! p } }' | sed "s|AU  - |      |g" | sed 's/^[ \t]*//' | grep -v "AUID- " | tr '\n' ';' > t4
+				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^PMID/,/^OWN/{{ /^OWN/! p } }' | sed "s|PMID- |PMID:|g" | sed 's/^[ \t]*//' > t5
+				
+				paste -d"|" t2 t3 t4 t5 > tmp2
+				rm t2
+				rm t3
+				rm t4
+				rm t5
+			touch list
+			M=$(cat list | wc -l)
+
+				for i in "${Types[@]}"; do
+					
+					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
+					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq > list22
+				 	awk '
+						{ 
+						    for (i=1; i<=NF; i++)  {
+						        a[NR,i] = $i
+						    }
+						}
+						NF>p { p = NF }
+						END {    
+    						for(j=1; j<=p; j++) {
+						        str=a[1,j]
+						        for(i=2; i<=NR; i++){
+						            str=str" "a[i,j];
+						        }
+						        print str
+						    }
+						}' list22 > file1.txt
+					tr ' ' ';' < file1.txt > tmp1
+					mv tmp1 file1.txt
+					paste -d"|" file.txt file1.txt tmp2 > file2.txt 2> /dev/null
+				 	cat info.txt file2.txt >> tmp1 && mv tmp1 info.txt
+				 	cat info.txt | uniq > tmp1 && mv tmp1 info.txt
+				 	cat info.txt | awk -F'|' '{print $1" | ",$2" | ",$3" | ",$4" | ",$5" | ",$6}' > tmp1 && mv tmp1 info.txt
+				 	rm file1.txt
+				 	rm file2.txt
+				 	rm list22
+				 	rm tmp2 2> /dev/null
+				done
+	
+	
+	
+	
+	#for k in $(cat URLS);do
+	#	touch list
+	#	M=$(cat list | wc -l)
+	#	for i in "${Types[@]}"; do
+		
+	#		lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
 			
-		done
+	#	done
 		N=$(cat list | wc -l)
 		if [[ "${N}" == "${M}" ]];
 			then
