@@ -58,6 +58,7 @@ chmod +x KARAJ.sh
 | -h	| Help | empty | `./KARAJ.sh -h `
 | -u	|Usage and examples | empty | `./KARAJ.sh -u]`
 | -c	| Number of cores | Number of accessible cores minus one | `./KARAJ.sh -c [core]`
+| -n	| Number of cores | Using this option, the processed data of selected accession numbers can be retrieved. By passing 1, only the processed data will be downloaded. The default value is 0 which ignores downloading processed data. This option must be used along with one of the options -p, -l or -f | `./KARAJ.sh -n [0/1]` 
 
 ------------------------------------------------------------------------------------------------------------------------
 ## Common Error messages
