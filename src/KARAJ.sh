@@ -83,7 +83,7 @@
 			echo "    -h                 help."
 			echo "    -u                 usage examples."
 			echo "    -j                 number of cores."
-			echo "    -n                 obtaining processed data of the corresponding study/studies by specifiying value 1. defult value is 0, which disables the operation."
+			echo "    -n                 obtaining processed data of the corresponding study/studies by specifying value 1. de-fault value is 0, which disables the operation."
 
 			exit 1
 		}
@@ -2392,7 +2392,11 @@ mv tmp_file list1
 			echo No sample found for "$j". Either the provided "$j" is invalid or raw data was not provided for this record
 			cat list | grep -v "$j" | sort | uniq > tmp && mv tmp list
 			cp list list1
+			rm -rf "${out}"/$j/check$j.txt 2> /dev/null
+			rm -rf "${out}"/$j/proccessed_url$j.txt 2> /dev/null
+			rm -rf "${out}"/$j 2> /dev/null
 		fi
+		
 	done
 	sleep 2
 	echo -ne '>>>>>>>>>>>>>>>>>>>>>>>>>>[100%]\r'
@@ -2409,6 +2413,7 @@ mv tmp_file list1
 				
 				done
 			done
+			
 	fi
 
 
@@ -2511,7 +2516,9 @@ if [[ -v core ]];
 				cat "${out}"/$w/urls$w.txt | parallel -j "${k}" ~/.aspera/connect/bin/ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh -q {} .
 				echo "downloading" "${w}" "is completed"
 				duration=$(( SECONDS - start ))
-			
+				rm "${out}"/$w/urls$w.txt  2> /dev/null
+				rm "${out}"/$w/check$w.txt  2> /dev/null
+				rm "${out}"/$w/proccessed_url$w.txt  2> /dev/null
 			done
 	  else	
 		th=$(lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)' | grep "^CPU(s):" | sed 's/CPU(s)://g' | sed 's/^[ \t]*//'| bc ) 
@@ -2526,7 +2533,9 @@ if [[ -v core ]];
 				cat "${out}"/$w/urls$w.txt | parallel -j "${k}" ~/.aspera/connect/bin/ascp -QT -l 300m --retry-timeout=1800 \
 				-P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh -q {} "${out}"/$w
 				echo "downloading" "${w}" "is completed"
-			
+				rm "${out}"/$w/urls$w.txt  2> /dev/null
+				rm "${out}"/$w/check$w.txt  2> /dev/null
+				rm "${out}"/$w/proccessed_url$w.txt  2> /dev/null
 			done
 		
 		duration=$(( SECONDS - start ))
@@ -2539,6 +2548,7 @@ rm -rf PMCIDlist 2> /dev/null
 rm -rf supp1 2> /dev/null
 rm -rf lines 2> /dev/null
 rm -rf tmp 2> /dev/null
+
 #######  END  #######
 
 
