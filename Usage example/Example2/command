@@ -65,4 +65,17 @@ This run took 330 seconds
 
 ************************************* End ************************************* 
 
-## Output
+## Outputs are one folder and one file named GSE126379 and info.txt, respectievly. 
+## info.txt is a summary table named info.txt containing PubMed URL, Title, Abstract, accession numbers used/published and PMID.
+## GSE126379 folder contains below files.
+## SRR8556723.fastq.gz
+## SRR8556724.fastq.gz
+## SRR8556725.fastq.gz
+## SRR8556726.fastq.gz
+## SRR8556731.fastq.gz
+## SRR8556732.fastq.gz
+## SRR8556727.fastq.gz
+## SRR8556728.fastq.gz
+## SRR8556729.fastq.gz
+## SRR8556730.fastq.gz
+
