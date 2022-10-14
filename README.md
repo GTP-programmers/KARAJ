@@ -154,7 +154,7 @@ In case of queries, please email: m.labani@unsw.edu.au or a.afrasiabi@unsw.edu.a
 ------------------------------------------------------------------------------------------------------------------------
 
 ## Acknowledgements
-This work was funded by the UNSW Scientia Program Fellowship and the Australian Research Council Discovery Early Career Researcher Award (DECRA), Macquarie PhD Scholarship and Australian Government Research Training Program (RTP) scholarship. Analyses were made possible with High Performance Computing resources provided by the BioMedical Machine Learning Lab with funding from the Australian Government and the UNSW SYDNEY.
+This research received no external funding. Mahdieh Labani was supported by a Macquarie University PhD Scholarship. Hamid Alinejad-Rokny was funded by a University of New South Wales (UNSW) Scientia Program Fellowship and an Australian Research Council Discovery Early Career Researcher Award. Ali Afrasiabi was supported by an Australian Government Research Training Program (RTP) scholarship. This project would not have been possible without High Performance Computing resources provided by the BioMedical Machine Learning Lab, UNSW Graduate School of Biomedical Engineering.
 
 ------------------------------------------------------------------------------------------------------------------------
 
