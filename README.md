@@ -32,7 +32,7 @@ We here developed KARAJ a fast and flexible Linux command-line tool to automate 
 KARAJ runs on LINUX. Install the package from Github using the following commands.
 
 ```
-wget https://github.com/Fringe-Lab/KARAJ/archive/refs/heads/main.zip
+wget https://github.com/GTP-programmers/KARAJ/archive/refs/heads/main.zip
 unzip main.zip
 cd KARAJ-main/src
 chmod +x installation.sh
