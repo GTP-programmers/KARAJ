@@ -113,15 +113,15 @@ $ ./KARAJ_V1.sh -l https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6492329/ -s 1
 11. Command for downloading supplementary files using article PMCID (please see the supplementary Supplementary figure 3):
 $ ./KARAJ.sh -p PMC6492329 -s 1
 
-12. Command for mining and downloading supplementary files for more than one articles using PMCID:
+12. Command for downloading supplementary tables using article PMCID (see supplemen-tary figure 3):
 $ ./KARAJ.sh -p PMC7182534 PMC6492329 PMC8000127 PMC6957475 PMC8455923 PMC8844275 PMC8426200 PMC7789210 -s 1
 
-13. Command for mining and downloading supplementary files for a list of articles using PMCID:
-First make a text file in the working directory entitled “PMCIDS” containing the list of article PMCIDs. Then run the below command. 
+13. Command for downloading supplementary tables of a list of articles using PMCID:
+First, make a text file in the working directory entitled “PMCIDS.txt” containing the list of article PMCIDs. Then run the following command
 $ ./KARAJ.sh -f 2 -s 1
 
-14. Command for mining and downloading supplementary files for a list of articles using article URLs:
-first make a text file in the working directory entitled “URLS” containing the list of article URLs. Then run the below command. 
+14. Command for downloading supplementary tables of a list of articles using article URL:
+First, make a file in the working directory entitled “URLS.txt” containing the list of article URLs. Then run the following command. 
 $ ./KARAJ.sh -f 3 -s 1
 
 ```
@@ -146,11 +146,11 @@ In case of queries, please email: m.labani@unsw.edu.au or a.afrasiabi@unsw.edu.a
 
 ## Author Info
 ### People who contributed to the KARAJ idea and code:
-* Mahdieh Labani 
-* Ali Afrasiabi
-* Amin Beheshti
-* Hamid Alinejad-Rokny
-* Nigel Lovell
+* Mahdieh Labani ( m.labani@unsw.edu.au )
+* Ali Afrasiabi ( a.afrasiabi@unsw.edu.au )
+* Amin Beheshti ( s.beheshti@unsw.edu.au )
+* Hamid Alinejad-Rokny ( h.alinejad@unsw.edu.au )
+* Nigel Lovell ( n.lovell@unsw.edu.au )
 
 ------------------------------------------------------------------------------------------------------------------------
 
