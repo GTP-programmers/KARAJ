@@ -93,8 +93,8 @@ $ ./KARAJ.sh -p PMC6492329 -s 0
 5. Command for mining the text of multiple articles for accession numbers and download-ing the sequence data corresponding to them – using PMCID of the articles:
 $ ./KARAJ.sh -p PMC7182534 PMC6492329 PMC8000127 PMC6957475 PMC8455923 PMC8844275 PMC8426200 PMC7789210 -s 0
 
-6. Command for mining and downloading datasets in a list of articles using PMCID:
-First make a text file in the working directory entitled “PMCIDS” containing the list of article PMCIDs. Then run the below command. 
+6. Command for mining a list of articles for accession numbers and downloading the se-quence data corresponding to them – using PMCID of the articles:
+First, make a file in the working directory entitled “PMCIDS.txt” containing the list of ar-ticle PMCIDs. Then run the following command
 $ ./KARAJ.sh -f 2 -s 0
 
 7. Command for mining the text of an article for accession numbers and downloading se-quence data corresponding to them – using URL of the article:
