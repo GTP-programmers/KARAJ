@@ -124,6 +124,10 @@ $ ./KARAJ.sh -f 2 -s 1
 First, make a file in the working directory entitled “URLS.txt” containing the list of article URLs. Then run the following command. 
 $ ./KARAJ.sh -f 3 -s 1
 
+15. Command for downloading the metadata table for sequence data of using accession number: 
+$ ./KARAJ.sh -i GSE126379 -s 0 -m 1
+
+
 ```
 ------------------------------------------------------------------------------------------------------------------------
 
