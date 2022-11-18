@@ -77,34 +77,34 @@ chmod +x KARAJ.sh
 ## Examples
 
 ```
-1. Command for downloading one accession number:
-$ ./KARAJ.sh -i GSE126379 -s 0  
+1. Command for downloading sequence data of one accession number:
+$ ./KARAJ.sh -i GSE126379   
 
-2. Command for downloading more than one accession numbers:
-$ ./KARAJ.sh -i GSE126379 GSE92521 PRJNA427709 SRR10668798 GSE115469 -s 0
+2. Command for downloading sequence data of multiple accession numbers:
+$ ./KARAJ.sh -i GSE126379 GSE92521 PRJNA427709 SRR10668798 GSE115469 
 
-3. Command for downloading a list of accession numbers:
-First make a text file in the working directory entitled “ACCESSIONS” containing the list of accession numbers. Then run the below command. 
-$ ./KARAJ.sh -f 1 -s 0
+3. Command for downloading sequence data of a list of accession numbers:
+First, make a file in the working directory entitled “ACCESSIONS.txt” containing the list of accession numbers. Then run the following command
+$ ./KARAJ.sh -f 1 
 
-4.Command for mining and downloading datasets in one article using PMCID:
+4. Command for mining the text of an article for accession numbers and downloading se-quence data corresponding to them – using PMCID of the article:
 $ ./KARAJ.sh -p PMC6492329 -s 0
 
-5. Command for mining and downloading datasets in more than one articles using PMCID:
+5. Command for mining the text of multiple articles for accession numbers and download-ing the sequence data corresponding to them – using PMCID of the articles:
 $ ./KARAJ.sh -p PMC7182534 PMC6492329 PMC8000127 PMC6957475 PMC8455923 PMC8844275 PMC8426200 PMC7789210 -s 0
 
 6. Command for mining and downloading datasets in a list of articles using PMCID:
 First make a text file in the working directory entitled “PMCIDS” containing the list of article PMCIDs. Then run the below command. 
 $ ./KARAJ.sh -f 2 -s 0
 
-7. Command for mining and downloading datasets in one article using URL:
+7. Command for mining the text of an article for accession numbers and downloading se-quence data corresponding to them – using URL of the article:
 $ ./KARAJ.sh -l https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6492329/ -s 0
 
-8. Command for mining and downloading datasets in more than one articles using article URL:
+8. Command for mining the text of multiple articles for accession numbers and download-ing the sequence data corresponding to them – using URL of the articles: 
 $ ./KARAJ.sh -l https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6492329/ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7182534/ -s 0
 
-9. Command for mining and downloading datasets in a list of articles using article URLs:
-first make a text file in the working directory entitled “URLS” containing the list of article URLs. Then run the below command. 
+9. Command for mining the text of a list of articles for accession numbers and downloading the sequence data corresponding to them – using the article URLs: 
+First, make a file in the working directory entitled “URLS.txt” containing the list of article URLs. Then run the following command.
 $ ./KARAJ.sh -f 3 -s 0
 
 10. Command for downloading supplementary files using article URL:
