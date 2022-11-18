@@ -35,8 +35,8 @@ KARAJ runs on LINUX. Install the package from Github using the following command
 wget https://github.com/GTP-programmers/KARAJ/archive/refs/heads/main.zip
 unzip main.zip
 cd KARAJ-main/src
-chmod +x installation.sh
-./installation.sh
+chmod +x Installer.sh
+./Installer.sh
 chmod +x KARAJ.sh
 
 ```
