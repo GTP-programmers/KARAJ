@@ -57,7 +57,7 @@ chmod +x KARAJ.sh
 | -m	| Downloading metadata. This option must be passed along with options -l, -p, -f or -i. | empty | `./KARAJ.sh -m [0/1]`
 | -h	| Help | empty | `./KARAJ.sh -h `
 | -u	|Usage and examples | empty | `./KARAJ.sh -u]`
-| -c	| Number of cores | Number of accessible cores minus one | `./KARAJ.sh -c [core]`
+| -j	| Number of cores | Number of accessible cores minus one | `./KARAJ.sh -c [core]`
 | -n	| Using this option, the processed data of selected accession numbers can be retrieved. By passing 1, only the processed data will be downloaded. The default value is 0 which ignores downloading processed data. This option must be used along with one of the options -p, -l or -f | empty | `./KARAJ.sh -n [0/1]` 
 
 ------------------------------------------------------------------------------------------------------------------------
