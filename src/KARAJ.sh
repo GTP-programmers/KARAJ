@@ -2513,9 +2513,11 @@ if [[ -v core ]];
 			for w in $(cat list1);do
 			
 				echo "KARAJ is downloading" "${w}" 
-				cat "${out}"/$w/urls$w.txt | parallel -j "${k}" ~/.aspera/connect/bin/ascp -QT -l 300m -P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh -q {} .
+				cat "${out}"/$w/urls$w.txt | parallel -j "${k}" ~/.aspera/connect/bin/ascp -QT -l 300m --retry-timeout=1800 \
+				-P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh -q {} "${out}"/$w
 				echo "downloading" "${w}" "is completed"
 				duration=$(( SECONDS - start ))
+				echo "This run took $duration seconds"
 				rm "${out}"/$w/urls$w.txt  2> /dev/null
 				rm "${out}"/$w/check$w.txt  2> /dev/null
 				rm "${out}"/$w/proccessed_url$w.txt  2> /dev/null
