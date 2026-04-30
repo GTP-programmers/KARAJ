@@ -82,24 +82,24 @@ function Version
 function usage
 {
     echo ""
-    echo "Instuction: the list of operations and options that are supported by KARAJ"
+    echo "Instruction: the list of operations and options that are supported by KARAJ"
     echo ""
-    echo "    -l                 list of URL(s), please see exmaples (usage examples -u) or github for further explanation."
-    echo "    -p                 list of PMCID(s), please see exmaples (usage examples -u) or github for further explanation."
+    echo "    -l                 list of URL(s), please see examples (usage examples -u) or github for further explanation."
+    echo "    -p                 list of PMCID(s), please see examples (usage examples -u) or github for further explanation."
     echo "    -o                 Output working directory."
-    echo "    -t                 type of files: bam/vcf/fastq, please see exmaples (usage examples -u) or github for further explanation."
-    echo "    -s                 obtaining suplemenatry data of the corresponding study/studies by specifiying value 1. defult value is 0, which disables the operation."
-    echo "    -f                 downloading list of PMCIDs, URLs or accession numbers by passing values 1, 2 and 3, repecteivly."
-    echo "                       please see exmaples (usage examples -u) or github for further explanation."
+    echo "    -t                 type of files: bam/vcf/fastq, please see examples (usage examples -u) or github for further explanation."
+    echo "    -s                 obtaining supplementary data of the corresponding study/studies by specifiying value 1. default value is 0, which disables the operation."
+    echo "    -f                 downloading list of PMCIDs, URLs or accession numbers by passing values 1, 2 and 3, respectively."
+    echo "                       please see examples (usage examples -u) or github for further explanation."
     echo "    -i                 accession number(s): PRJNA/SRP/ERP/GSE/SRR/SRA/SRX/SRS/ERX/ERS/ERP/DRR/DRS/DRX/DRP/GSM/ENCSR/ENCSB/ENCSD/CXR/SAMN."
-    echo "    -d                 defualt value is 0 which means downloading data for all accession numbers obtained from URL(s) or PMCID(s)."
+    echo "    -d                 default value is 0 which means downloading data for all accession numbers obtained from URL(s) or PMCID(s)."
     echo "                       by passing value 1 user can select accession numbers to download later on by the summary result."
     echo "    -m                 obtaining metadata table containing sample information and experimental design of the corresponding study."
     echo "    -h                 help."
     echo "    -u                 usage examples."
     echo "    -v                 version and about."
     echo "    -j                 number of cores."
-    echo "    -n                 obtaining processed data of the corresponding study/studies by specifying value 1. de-fault value is 0, which disables the operation."
+    echo "    -n                 obtaining processed data of the corresponding study/studies by specifying value 1. default value is 0, which disables the operation."
 }
 
 #********************************* FUNCTION Example *********************************
@@ -409,7 +409,7 @@ print_summary_report()
         | sed 's/2\. /Type: /; s/1\. /Description: /')
 
     echo "${C}. ${B}"
-    echo "Overall experiment desgin: ${D}"
+    echo "Overall experiment design: ${D}"
     echo "$gds_info" | grep 'Description: '
     echo "$gds_info" | grep 'Type: '
     echo "$gds_info" | grep -Eo '[0-9]+ Samples' | sed 's/^[[:space:]]*//'
@@ -449,6 +449,55 @@ fetch_ena_filereport()
     fi
 
     return 0
+}
+#********************************* FUNCTION phase *********************************
+# Print a stage transition: "[1/3] message"
+phase()
+{
+    local step="$1"
+    local total="$2"
+    shift 2
+    echo "[${step}/${total}] $*"
+}
+
+#********************************* FUNCTION substep *********************************
+# Print a per-iteration progress line: "  [3/12] SRR8556723... done"
+# Usage: substep <i> <n> <label> [status]
+substep()
+{
+    local i="$1"
+    local n="$2"
+    local label="$3"
+    local status="${4:-}"
+    if [[ -n "$status" ]]; then
+        echo "  [${i}/${n}] ${label}... ${status}"
+    else
+        echo "  [${i}/${n}] ${label}..."
+    fi
+}
+
+#********************************* FUNCTION verify_md5 *********************************
+# Compare a file's MD5 against an expected value.
+# Args:   $1 = file path
+#         $2 = expected MD5 (lowercase hex)
+# Returns: 0 if match, 1 if mismatch or file missing
+verify_md5()
+{
+    local file="$1"
+    local expected="$2"
+    local actual
+
+    if [[ ! -f "$file" ]]; then
+        return 1
+    fi
+
+    actual=$(md5sum "$file" 2>/dev/null | awk '{print $1}')
+
+    if [[ "$actual" == "$expected" ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 #********************************* FUNCTION resolve_accession_to_gse *********************************
@@ -581,7 +630,7 @@ n_modes=0
 [[ -n "${ID[*]}"    ]] && (( n_modes++ ))
 
 if (( n_modes > 1 )); then
-    echo "Two obligatory flags are used with each other. Please enter one of these flagss." >&2
+    echo "Cannot use two of these flags together: -p, -l, -i, or -f." >&2
     exit 0
 fi
 
@@ -915,450 +964,63 @@ if [[ "$file" == '1' ]]; then
             echo "##############################################"
             echo ""
             cp list list1
-elif [[ $file == '2' ]];
-	then
-	cp ACCESSIONS.txt list1
-        
-    
-	## converting ERP to GSE
-	grep ERP list1 >> ERP
-	grep -v ERP list1 > tmp_file
-	mv tmp_file list1
-
-	for j in $(cat ERP);
-	do
-	
-	      (esearch -db gds -query ERP001942 | efetch -format runinfo | grep 'Accession:' | grep -Eo "GSE[0-9]{1,20}" | sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq ) >> list1
-	      cat list1 | sort | uniq > tmp && mv tmp list1
-	      
-	done
-    
-	## converting PRJN to GSE   
-	grep PRJN list1 >> PRJN
-	grep -v PRJN list1 > tmp_file
-	mv tmp_file list1
-
-	for j in $(cat PRJN);
-	do
-	
-	      (esearch -db sra -query ${j} | efetch -format runinfo | awk -F',' '{print $21}' | uniq | sed '1d') >> list1	
-	      cat list1 | sort | uniq > tmp && mv tmp list1
-	      
-	done
-	## converting SRP to GSE 
-	grep SRP list1 >> SRP
-	grep -v SRP list1 > tmp_file
-	mv tmp_file list1
-
-	for j in $(cat SRP);
-	do
-	
-		A=$(esearch -db sra -query ${j} | efetch -format runinfo | awk -F',' '{print $21}' | uniq | sed '1d')
-		pysradb srp-to-gse "${A}" | awk '{print $2}' | sed '1d' >> list1
-		cat list1 | sort | uniq > tmp && mv tmp list1
-
-	done
-	## converting PRJNA to GSE 
-	grep PRJNA list1 >> PRJNA
-	grep -v PRJNA list1 > tmp_file
-	mv tmp_file list1
-
-	for j in $(cat PRJNA);
-	do
-	
-		(esearch -db sra -query ${j} | efetch -format runinfo | awk -F',' '{print $21}' | uniq | sed '1d') >> list1	
-		pysradb srp-to-gse "${A}" | awk '{print $2}' | sed '1d'
-		cat list1 | sort | uniq > tmp && mv tmp list1
-	
-	done
-	rm ERP
-	rm SRP
-	rm PRJN
-	rm PRJNA
-	
-      
-	for j in $(cat list1);
-	do
-	
-		l="https://www.ncbi.nlm.nih.gov/pmc/articles/${j}/"
-		echo $l >> PMCIDlist
-		cat PMCIDlist | sort | uniq > tmp && mv tmp PMCIDlist
-	
-	done
-	
-	if [[ -v supp ]];
-		  then
-			  if [[ $supp == '1' ]];
-			 	 then
-			       
-			
-			   	 for p in $(cat PMCIDlist);do
-				       
-					lynx -dump -listonly ${p} | grep '[.]xls\|[.]xlsx\|[.]txt\|[.]tsv' | grep -v "Article" | awk '{print $2}' | sort | uniq >> supp1
-					lynx -dump -listonly ${p} | grep '[.]zip' | awk '{print $2}' | sort | uniq >> supp1
-					Z=$(echo $p | grep -Eo "PMC[0-9]{1,20}" | sed 's/ *$//' | sort | uniq)
-					mkdir "${out}"/"${Z}"
-						for s in $(cat supp1); do
-					
-							#echo $s
-							dir=$(echo ~)
-							#cd $out
-							axel -n 4 -s1000000000000 $s -o "${out}"/"${Z}"
-						done
-				done
-				exit 0
-			  fi
-	else
-						for p in $(cat PMCIDlist);do
-											 
-							lynx -dump -listonly ${p} | grep '[.]xls\|[.]xlsx\|[.]txt\|[.]tsv' | grep -v "Article" | awk '{print $2}' | sort | uniq >> supp1
-							lynx -dump -listonly ${p} | grep '[.]zip' | awk '{print $2}' | sort | uniq >> supp1
-							Z=$(echo $p | grep -Eo "PMC[0-9]{1,20}" | sed 's/ *$//' | sort | uniq)
-							mkdir "${out}"/"${Z}"
-						for s in $(cat supp1); do
-
-							dir=$(echo ~)
-							axel -n 4 -s1000000000000 $s -o "${out}"/"${Z}"
-						done
-						done
-		
-	fi
-	
-	
-	Types=("GSE" "PRJNA" "ERP" "SRP")
-
-		touch info.txt
-		for k in $(cat PMCIDlist);do
-		
-			printf '%s\n' ${k} > file.txt
-				lynx -dump ${k} | grep -Eo "PMID: \[.*\][0-9]{1,20}" | sed -e 's/.*]//g' > PMID
-			   	PMID=$(cat PMID)
-				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^TI/,/^PG/{{ /^PG/! p } }' | sed "s|TI  - |      |g" | sed 's/^[ \t]*//' | tr '\n' ' ' > t2
-				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AB/,/^FAU /{{ /^FAU /! p } }' | sed "s|AB  - |      |g" | sed 's/^[ \t]*//' | grep -v "CI  - " | tr '\n' ' ' > t3
-				
-				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^AU/,/^AD/{{ /^AD/! p } }' | sed "s|AU  - |      |g" | sed 's/^[ \t]*//' | grep -v "AUID- " | tr '\n' ';' > t4
-				efetch -db pubmed -id ${PMID} -format medline | sed -n '/^PMID/,/^OWN/{{ /^OWN/! p } }' | sed "s|PMID- |PMID:|g" | sed 's/^[ \t]*//' > t5
-				
-				paste -d"|" t2 t3 t4 t5 > tmp2
-				rm t2
-				rm t3
-				rm t4
-				rm t5
-			touch list
-			M=$(cat list | wc -l)
-
-				for i in "${Types[@]}"; do
-					
-					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq >> list
-					lynx -dump ${k} | grep -Eo "$i[0-9]{1,20}"| sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq > list22
-				 	awk '
-						{ 
-						    for (i=1; i<=NF; i++)  {
-						        a[NR,i] = $i
-						    }
-						}
-						NF>p { p = NF }
-						END {    
-    						for(j=1; j<=p; j++) {
-						        str=a[1,j]
-						        for(i=2; i<=NR; i++){
-						            str=str" "a[i,j];
-						        }
-						        print str
-						    }
-						}' list22 > file1.txt
-					tr ' ' ';' < file1.txt > tmp1
-					mv tmp1 file1.txt
-					paste -d"|" file.txt file1.txt tmp2 > file2.txt 2> /dev/null
-				 	cat info.txt file2.txt >> tmp1 && mv tmp1 info.txt
-				 	cat info.txt | uniq > tmp1 && mv tmp1 info.txt
-				 	cat info.txt | awk -F'|' '{print $1" | ",$2" | ",$3" | ",$4" | ",$5" | ",$6}' > tmp1 && mv tmp1 info.txt
-				 	rm file1.txt
-				 	rm file2.txt
-				 	rm list22
-				 	rm file.txt 2> /dev/null
-				 	rm tmp2 2> /dev/null
-				done
-	      N=$(cat list | wc -l)
-	      if [[ "${N}" == "${M}" ]];
-	      then
-	      	      
-	      Z=$(echo ${k} | grep -Eo "PMC[0-9]{1,20}" | sed 's/ *$//' | sort | uniq)
-	      echo "There is no accession number in the text of" "${Z}"
-	      echo ""
-	      
-	      fi
-	     	      cat list | sort | uniq > tmp && mv tmp list
-     done
-     
-     if [[ -z $(cat list) ]];
-        then
-     	     echo "There is no accession number in the text of" "${PMCID}"
-	     echo ""
-	     exit 0
-        fi
-	echo "summary report:"
-	echo ""
-
-	cp list list1
-	mapfile lines < list
-	
-	## generating metadata
-mapfile lines < list
-if [[ -v meta ]]; 
-	then
-		if [[ $meta == '1' ]];
-			then
-			for idx in "${!lines[@]}";do
-
-				B=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $2}')
-				X=$(echo "${B}" | rev | cut -c4- | rev)
-				y=$(echo "${X}""nnn")
-				l="https://ftp.ncbi.nlm.nih.gov/geo/series/"${y}"/"${B}"/matrix/"${B}"_series_matrix.txt.gz"
-				mkdir "${out}"/"${B}" 
-				wget -q -P "${out}"/"${B}" ""${l}""
-				gunzip "${out}"/"${B}"/"${B}"_series_matrix.txt.gz
-				cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_title' | sed 's/!Sample_title//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp1
-				cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_geo_accession' | sed 's/!Sample_geo_accession//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp2
-				cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_source_name_ch1' | sed 's/!Sample_source_name_ch1//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp3
-
-				awk '
-				{ 
-				    for (i=1; i<=NF; i++)  {
-					a[NR,i] = $i
-				    }
-				}
-				NF>p { p = NF }
-				END {    
-				    for(j=1; j<=p; j++) {
-					str=a[1,j]
-					for(i=2; i<=NR; i++){
-					    str=str" "a[i,j];
-					}
-					print str
-				    }
-				}' "${out}"/"${B}"/"${B}"_tmp1 > "${out}"/"${B}"/"${B}"_tmp11
-				rm -rf "${out}"/"${B}"/"${B}"_tmp1
-
-				awk '
-				{ 
-				    for (i=1; i<=NF; i++)  {
-					a[NR,i] = $i
-				    }
-				}
-				NF>p { p = NF }
-				END {    
-				    for(j=1; j<=p; j++) {
-					str=a[1,j]
-					for(i=2; i<=NR; i++){
-					    str=str" "a[i,j];
-					}
-					print str
-				    }
-				}' "${out}"/"${B}"/"${B}"_tmp2 > "${out}"/"${B}"/"${B}"_tmp22
-				rm -rf "${out}"/"${B}"/"${B}"_tmp2
-
-				awk '
-				{ 
-				    for (i=1; i<=NF; i++)  {
-					a[NR,i] = $i
-				    }
-				}
-				NF>p { p = NF }
-				END {    
-				    for(j=1; j<=p; j++) {
-					str=a[1,j]
-					for(i=2; i<=NR; i++){
-					    str=str" "a[i,j];
-					}
-					print str
-				    }
-				}' "${out}"/"${B}"/"${B}"_tmp3 > "${out}"/"${B}"/"${B}"_tmp33
-				rm -rf "${out}"/"${B}"/"${B}"_tmp3
-
-				paste "${out}"/"${B}"/"${B}"_tmp11 "${out}"/"${B}"/"${B}"_tmp22 "${out}"/"${B}"/"${B}"_tmp33 > "${out}"/"${B}"/"${B}"_tmp44
-
-				rm -rf "${out}"/"${B}"/"${B}"_tmp11
-				rm -rf "${out}"/"${B}"/"${B}"_tmp22
-				rm -rf "${out}"/"${B}"/"${B}"_tmp33
-
-				cat "${out}"/"${B}"/"${B}"_tmp44 | sed 's/"//g' > "${out}"/"${B}"/"${B}"_metadata  
-				sed -i '1s/^/Sample_name\tRunID\tSampleID\n/' "${out}"/"${B}"/"${B}"_metadata
-
-				rm -rf "${out}"/"${B}"/"${B}"_tmp44
-				rm -rf "${out}"/"${B}"/"${B}"_series_matrix.txt
-			done
-			exit 0
-			
-		elif [[ $meta == '0' ]];
-			then
-				for idx in "${!lines[@]}";do
-
-					B=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $2}')
-					X=$(echo "${B}" | rev | cut -c4- | rev)
-					y=$(echo "${X}""nnn")
-					l="https://ftp.ncbi.nlm.nih.gov/geo/series/"${y}"/"${B}"/matrix/"${B}"_series_matrix.txt.gz"
-					mkdir "${out}"/"${B}" 
-					wget -q -P "${out}"/"${B}" ""${l}""
-					gunzip "${out}"/"${B}"/"${B}"_series_matrix.txt.gz
-					cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_title' | sed 's/!Sample_title//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp1
-					cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_geo_accession' | sed 's/!Sample_geo_accession//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp2
-					cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_source_name_ch1' | sed 's/!Sample_source_name_ch1//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp3
-
-					awk '
-					{ 
-					    for (i=1; i<=NF; i++)  {
-						a[NR,i] = $i
-					    }
-					}
-					NF>p { p = NF }
-					END {    
-					    for(j=1; j<=p; j++) {
-						str=a[1,j]
-						for(i=2; i<=NR; i++){
-						    str=str" "a[i,j];
-						}
-						print str
-					    }
-					}' "${out}"/"${B}"/"${B}"_tmp1 > "${out}"/"${B}"/"${B}"_tmp11
-					rm -rf "${out}"/"${B}"/"${B}"_tmp1
-
-					awk '
-					{ 
-					    for (i=1; i<=NF; i++)  {
-						a[NR,i] = $i
-					    }
-					}
-					NF>p { p = NF }
-					END {    
-					    for(j=1; j<=p; j++) {
-						str=a[1,j]
-						for(i=2; i<=NR; i++){
-						    str=str" "a[i,j];
-						}
-						print str
-					    }
-					}' "${out}"/"${B}"/"${B}"_tmp2 > "${out}"/"${B}"/"${B}"_tmp22
-					rm -rf "${out}"/"${B}"/"${B}"_tmp2
-
-					awk '
-					{ 
-					    for (i=1; i<=NF; i++)  {
-						a[NR,i] = $i
-					    }
-					}
-					NF>p { p = NF }
-					END {    
-					    for(j=1; j<=p; j++) {
-						str=a[1,j]
-						for(i=2; i<=NR; i++){
-						    str=str" "a[i,j];
-						}
-						print str
-					    }
-					}' "${out}"/"${B}"/"${B}"_tmp3 > "${out}"/"${B}"/"${B}"_tmp33
-					rm -rf "${out}"/"${B}"/"${B}"_tmp3
-
-					paste "${out}"/"${B}"/"${B}"_tmp11 "${out}"/"${B}"/"${B}"_tmp22 "${out}"/"${B}"/"${B}"_tmp33 > "${out}"/"${B}"/"${B}"_tmp44
-
-					rm -rf "${out}"/"${B}"/"${B}"_tmp11
-					rm -rf "${out}"/"${B}"/"${B}"_tmp22
-					rm -rf "${out}"/"${B}"/"${B}"_tmp33
-
-					cat "${out}"/"${B}"/"${B}"_tmp44 | sed 's/"//g' > "${out}"/"${B}"/"${B}"_metadata  
-					sed -i '1s/^/Sample_name\tRunID\tSampleID\n/' "${out}"/"${B}"/"${B}"_metadata
-
-					rm -rf "${out}"/"${B}"/"${B}"_tmp44
-					rm -rf "${out}"/"${B}"/"${B}"_series_matrix.txt
-					done
-	fi
-fi		
-	# echo "summary report:"
-	# echo ""
-	# mapfile lines < list
-	# for idx in "${!lines[@]}";do
-
-	# 			B=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $2}')
-	# 			X=$(echo "${B}" | rev | cut -c4- | rev)
-	# 			y=$(echo "${X}""nnn")
-	# 			l="https://ftp.ncbi.nlm.nih.gov/geo/series/"${y}"/"${B}"/matrix/"${B}"_series_matrix.txt.gz"
-	# 			mkdir "${out}"/"${B}" 
-	# 			wget -q -P "${out}"/"${B}" ""${l}""
-	# 			gunzip "${out}"/"${B}"/"${B}"_series_matrix.txt.gz
-	# 			D=$(cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Series_overall_design' | sed 's/!Series_overall_design//g' | sed 's/^[ \t]*//' | sed 's/"//g')
-	# 			C=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $1}')
-	# 			esearch -db gds -query "${B}" | efetch | grep '^1\.\|^2\.\|Platform:' | grep -v "Series:" | sed 's/2\. /Type: /' | sed 's/1\. /Description: /' > tmp
-	# 			echo "${C}".  "${B}"> tmp1
-	# 			sed -i 's/^[ \t]*//' tmp1
-	# 			echo "Overall experiment desgin"":" "${D}" > tmp2
-	# 			cat tmp | grep "Description: " > tmp3
-	# 			cat tmp | grep "Type: " > tmp4
-	# 			cat tmp | grep -Eo '[0-9]{1,10} Samples' | sed 's/^[ \t]*//' > tmp5
-	# 			echo "##############################################" > tmp6
-	# 			cat tmp1 tmp2 tmp3 tmp4 tmp5 tmp6
-	# 			rm tmp1
-	# 			rm tmp2
-	# 			rm tmp3
-	# 			rm tmp4
-	# 			rm tmp5
-	# 			rm tmp6
-	# 			rm tmp
-	# 			rm -rf "${out}"/"${B}"/"${B}"_series_matrix.txt
-
-	# done
-	
-	echo "summary report:"
-echo ""
-mapfile lines < list
-
-for idx in "${!lines[@]}"; do
-
-    B=$(printf "%5d %s" $((idx+1)) "${lines[idx]}" | awk '{print $2}')
-    C=$(printf "%5d %s" $((idx+1)) "${lines[idx]}" | awk '{print $1}')
-
-    ## GEO accessions have GEO series_matrix files
-    if [[ "$B" =~ ^GSE[0-9]+$ ]]; then
-
-        X=$(echo "${B}" | rev | cut -c4- | rev)
-        y=$(echo "${X}""nnn")
-        l="https://ftp.ncbi.nlm.nih.gov/geo/series/${y}/${B}/matrix/${B}_series_matrix.txt.gz"
-
-        mkdir -p "${out}/${B}"
-        wget -q -P "${out}/${B}" "$l"
-
-        if [[ -s "${out}/${B}/${B}_series_matrix.txt.gz" ]]; then
-            gunzip -f "${out}/${B}/${B}_series_matrix.txt.gz"
-            D=$(grep '^!Series_overall_design' "${out}/${B}/${B}_series_matrix.txt" | sed 's/!Series_overall_design//g' | sed 's/^[ \t]*//' | sed 's/"//g')
-        else
-            D=""
-        fi
-
-        esearch -db gds -query "${B}" | efetch | grep '^1\.\|^2\.\|Platform:' | grep -v "Series:" | sed 's/2\. /Type: /' | sed 's/1\. /Description: /' > tmp
-
-        echo "${C}. ${B}" > tmp1
-        sed -i 's/^[ \t]*//' tmp1
-        echo "Overall experiment desgin: ${D}" > tmp2
-        cat tmp | grep "Description: " > tmp3
-        cat tmp | grep "Type: " > tmp4
-        cat tmp | grep -Eo '[0-9]{1,10} Samples' | sed 's/^[ \t]*//' > tmp5
-        echo "##############################################" > tmp6
-        cat tmp1 tmp2 tmp3 tmp4 tmp5 tmp6
-
-        rm -f tmp1 tmp2 tmp3 tmp4 tmp5 tmp6 tmp
-        rm -f "${out}/${B}/${B}_series_matrix.txt"
-
-    ## Direct SRA/SRR/SRX/SRS accessions do not have GEO series_matrix files
+elif [[ "$file" == '2' ]]; then
+    ## locate ACCESSIONS.txt in PWD or $out
+    if [[ -f ACCESSIONS.txt ]]; then
+        accessions_file="ACCESSIONS.txt"
+    elif [[ -f "${out}/ACCESSIONS.txt" ]]; then
+        accessions_file="${out}/ACCESSIONS.txt"
     else
-        echo "${C}. ${B}"
-        echo "Direct SRA/SRR accession; GEO series matrix summary skipped."
-        echo "##############################################"
+        echo "ERROR: ACCESSIONS.txt not found in current directory or in ${out}" >&2
+        exit 1
     fi
 
-done
-	
-	echo ""
-	echo "##############################################" 
-	echo "${ACCESSIONS}" "specified to download"
+    : >list1
+    while IFS= read -r acc || [[ -n "$acc" ]]; do
+        [[ -z "$acc" ]] && continue
+        echo "$acc" >>list1
+    done <"$accessions_file"
+
+    sort -u list1 -o list1
+
+    ## resolve any non-GSE study accessions (ERP/PRJN/SRP/PRJNA) to GSEs
+    new_list=$(while IFS= read -r acc; do
+        [[ -z "$acc" ]] && continue
+        if resolved=$(resolve_accession_to_gse "$acc"); then
+            echo "$resolved"
+        else
+            echo "$acc"
+        fi
+    done <list1)
+    echo "$new_list" | sort -u >list1
+    cp list1 list
+
+    if [[ ! -s list ]]; then
+        exit 0
+    fi
+
+    mapfile -t lines <list
+
+    ## generating metadata
+    if [[ "${meta:-0}" == '1' ]]; then
+        for B in "${lines[@]}"; do
+            generate_metadata_table "$B"
+        done
+        exit 0
+    fi
+
+    ## generating summary report
+    echo "summary report:"
+    echo ""
+    for idx in "${!lines[@]}"; do
+        print_summary_report "${lines[idx]}" "$((idx+1))"
+    done
+
+    echo ""
+    echo "##############################################"
+    echo "$(cat list) specified to download"
+    echo "##############################################"
+    echo ""
 	echo "##############################################" 
 	echo ""
 	
@@ -1475,303 +1137,61 @@ else
 fi 
 
 
-## downloading sequnce data using a list of accession numbers
-if [[ -v ID ]];
-	then
-    
-	for j in "${!ID[@]}"; do
-	
-		echo ${ID[j]} >> PMCIDlist
-		
-	done
-		cat PMCIDlist | sort | uniq > tmp && mv tmp PMCIDlist
-		cp PMCIDlist list1
-		cat list1 | sort | uniq > tmp && mv tmp list1
-	    
-		#convert ERP to GSE 
-		grep ERP list1 >> ERP
-		grep -v ERP list1 > tmp_file
-		mv tmp_file list1
+## downloading sequence data using a list of accession numbers
+## downloading sequence data using a list of accession numbers
+if [[ -v ID ]]; then
+    : >list1
+    for j in "${!ID[@]}"; do
+        echo "${ID[j]}" >>list1
+    done
+    sort -u list1 -o list1
 
-		for j in $(cat ERP);do
-		
-		      (esearch -db gds -query ${j} | efetch -format runinfo | grep 'Accession:' | grep -Eo "GSE[0-9]{1,20}" | sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq ) >> list1
-		      cat list1 | sort | uniq > tmp && mv tmp list1
-		      
-		done
-	    
-		#convert PRJN to GSE    
-		grep PRJN list1 >> PRJN
-		grep -v PRJN list1 > tmp_file
-		mv tmp_file list1
+    ## resolve any non-GSE study accessions (ERP/PRJN/SRP/PRJNA) to GSEs
+    new_list=$(while IFS= read -r acc; do
+        [[ -z "$acc" ]] && continue
+        if resolved=$(resolve_accession_to_gse "$acc"); then
+            echo "$resolved"
+        else
+            echo "$acc"
+        fi
+    done <list1)
+    echo "$new_list" | sort -u >list1
+    cp list1 list
 
-		for j in $(cat PRJN);do
-		
-		      (esearch -db sra -query ${j} | efetch -format runinfo | awk -F',' '{print $21}' | uniq | sed '1d') >> list1	
-		      cat list1 | sort | uniq > tmp && mv tmp list1
-		      
-		done
-		#convert SRP to GSE 
-		 grep SRP list1 >> SRP
-		 grep -v SRP list1 > tmp_file
-		 mv tmp_file list1
+    if [[ ! -s list ]]; then
+        exit 0
+    fi
 
-		for j in $(cat SRP);do
+    mapfile -t lines <list
 
-			(esearch -db gds -query ${j} | efetch -format runinfo | grep 'Accession:' | grep -Eo "GSE[0-9]{1,20}" | sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq ) >> list1
-			cat list1 | sort | uniq > tmp && mv tmp list1
+    ## generating metadata
+    if [[ "${meta:-0}" == '1' ]]; then
+        for B in "${lines[@]}"; do
+            generate_metadata_table "$B"
+        done
+        exit 0
+    fi
 
-		done
-		#convert PRJNA to GSE 
-		grep PRJNA list1 >> PRJNA
-		grep -v PRJNA list1 > tmp_file
-		mv tmp_file list1
+    ## generating summary report
+    echo "summary report:"
+    echo ""
+    for idx in "${!lines[@]}"; do
+        print_summary_report "${lines[idx]}" "$((idx+1))"
+    done
 
-		for j in $(cat PRJNA);do
-		
-			(esearch -db gds -query "${j}" | efetch -format runinfo | grep 'Accession:' | grep -Eo "GSE[0-9]{1,20}" | sed 's/^[ \t]*//' | sed 's/ *$//' | sort | uniq ) >> list1
-			cat list1 | sort | uniq > tmp && mv tmp list1
-
-		done
-
-		rm ERP
-		rm SRP
-		rm PRJN
-		rm PRJNA
-		cp list1 list
-
-## generating metadata
-mapfile lines < list
-if [[ -v meta ]]; 
-	then
-		if [[ $meta == '1' ]];
-			then
-			for idx in "${!lines[@]}";do
-
-				B=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $2}')
-				C=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $1}')
-
-				if [[ ! "$B" =~ ^GSE[0-9]+$ ]]; then
-					echo "${C}. ${B}"
-					echo "Direct SRA/SRR accession; GEO series matrix summary skipped."
-					echo "##############################################"
-					continue
-				fi
-
-				
-				X=$(echo "${B}" | rev | cut -c4- | rev)
-				y=$(echo "${X}""nnn")
-				l="https://ftp.ncbi.nlm.nih.gov/geo/series/"${y}"/"${B}"/matrix/"${B}"_series_matrix.txt.gz"
-				mkdir "${out}"/"${B}" 
-				wget -q -P "${out}"/"${B}" ""${l}""
-				gunzip "${out}"/"${B}"/"${B}"_series_matrix.txt.gz
-				cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_title' | sed 's/!Sample_title//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp1
-				cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_geo_accession' | sed 's/!Sample_geo_accession//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp2
-				cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_source_name_ch1' | sed 's/!Sample_source_name_ch1//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp3
-
-				awk '
-				{ 
-				    for (i=1; i<=NF; i++)  {
-					a[NR,i] = $i
-				    }
-				}
-				NF>p { p = NF }
-				END {    
-				    for(j=1; j<=p; j++) {
-					str=a[1,j]
-					for(i=2; i<=NR; i++){
-					    str=str" "a[i,j];
-					}
-					print str
-				    }
-				}' "${out}"/"${B}"/"${B}"_tmp1 > "${out}"/"${B}"/"${B}"_tmp11
-				rm -rf "${out}"/"${B}"/"${B}"_tmp1
-
-				awk '
-				{ 
-				    for (i=1; i<=NF; i++)  {
-					a[NR,i] = $i
-				    }
-				}
-				NF>p { p = NF }
-				END {    
-				    for(j=1; j<=p; j++) {
-					str=a[1,j]
-					for(i=2; i<=NR; i++){
-					    str=str" "a[i,j];
-					}
-					print str
-				    }
-				}' "${out}"/"${B}"/"${B}"_tmp2 > "${out}"/"${B}"/"${B}"_tmp22
-				rm -rf "${out}"/"${B}"/"${B}"_tmp2
-
-				awk '
-				{ 
-				    for (i=1; i<=NF; i++)  {
-					a[NR,i] = $i
-				    }
-				}
-				NF>p { p = NF }
-				END {    
-				    for(j=1; j<=p; j++) {
-					str=a[1,j]
-					for(i=2; i<=NR; i++){
-					    str=str" "a[i,j];
-					}
-					print str
-				    }
-				}' "${out}"/"${B}"/"${B}"_tmp3 > "${out}"/"${B}"/"${B}"_tmp33
-				rm -rf "${out}"/"${B}"/"${B}"_tmp3
-
-				paste "${out}"/"${B}"/"${B}"_tmp11 "${out}"/"${B}"/"${B}"_tmp22 "${out}"/"${B}"/"${B}"_tmp33 > "${out}"/"${B}"/"${B}"_tmp44
-
-				rm -rf "${out}"/"${B}"/"${B}"_tmp11
-				rm -rf "${out}"/"${B}"/"${B}"_tmp22
-				rm -rf "${out}"/"${B}"/"${B}"_tmp33
-
-				cat "${out}"/"${B}"/"${B}"_tmp44 | sed 's/"//g' > "${out}"/"${B}"/"${B}"_metadata  
-				sed -i '1s/^/Sample_name\tRunID\tSampleID\n/' "${out}"/"${B}"/"${B}"_metadata
-
-				rm -rf "${out}"/"${B}"/"${B}"_tmp44
-				rm -rf "${out}"/"${B}"/"${B}"_series_matrix.txt
-			done
-			exit 0
-			
-		elif [[ $meta == '0' ]];
-			then
-				for idx in "${!lines[@]}";do
-
-					B=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $2}')
-					X=$(echo "${B}" | rev | cut -c4- | rev)
-					y=$(echo "${X}""nnn")
-					l="https://ftp.ncbi.nlm.nih.gov/geo/series/"${y}"/"${B}"/matrix/"${B}"_series_matrix.txt.gz"
-					mkdir "${out}"/"${B}" 
-					wget -q -P "${out}"/"${B}" ""${l}""
-					gunzip "${out}"/"${B}"/"${B}"_series_matrix.txt.gz
-					cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_title' | sed 's/!Sample_title//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp1
-					cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_geo_accession' | sed 's/!Sample_geo_accession//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp2
-					cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Sample_source_name_ch1' | sed 's/!Sample_source_name_ch1//g' | sed 's/^[ \t]*//' | sed 's/ /_/g' > "${out}"/"${B}"/"${B}"_tmp3
-
-					awk '
-					{ 
-					    for (i=1; i<=NF; i++)  {
-						a[NR,i] = $i
-					    }
-					}
-					NF>p { p = NF }
-					END {    
-					    for(j=1; j<=p; j++) {
-						str=a[1,j]
-						for(i=2; i<=NR; i++){
-						    str=str" "a[i,j];
-						}
-						print str
-					    }
-					}' "${out}"/"${B}"/"${B}"_tmp1 > "${out}"/"${B}"/"${B}"_tmp11
-					rm -rf "${out}"/"${B}"/"${B}"_tmp1
-
-					awk '
-					{ 
-					    for (i=1; i<=NF; i++)  {
-						a[NR,i] = $i
-					    }
-					}
-					NF>p { p = NF }
-					END {    
-					    for(j=1; j<=p; j++) {
-						str=a[1,j]
-						for(i=2; i<=NR; i++){
-						    str=str" "a[i,j];
-						}
-						print str
-					    }
-					}' "${out}"/"${B}"/"${B}"_tmp2 > "${out}"/"${B}"/"${B}"_tmp22
-					rm -rf "${out}"/"${B}"/"${B}"_tmp2
-
-					awk '
-					{ 
-					    for (i=1; i<=NF; i++)  {
-						a[NR,i] = $i
-					    }
-					}
-					NF>p { p = NF }
-					END {    
-					    for(j=1; j<=p; j++) {
-						str=a[1,j]
-						for(i=2; i<=NR; i++){
-						    str=str" "a[i,j];
-						}
-						print str
-					    }
-					}' "${out}"/"${B}"/"${B}"_tmp3 > "${out}"/"${B}"/"${B}"_tmp33
-					rm -rf "${out}"/"${B}"/"${B}"_tmp3
-
-					paste "${out}"/"${B}"/"${B}"_tmp11 "${out}"/"${B}"/"${B}"_tmp22 "${out}"/"${B}"/"${B}"_tmp33 > "${out}"/"${B}"/"${B}"_tmp44
-
-					rm -rf "${out}"/"${B}"/"${B}"_tmp11
-					rm -rf "${out}"/"${B}"/"${B}"_tmp22
-					rm -rf "${out}"/"${B}"/"${B}"_tmp33
-
-					cat "${out}"/"${B}"/"${B}"_tmp44 | sed 's/"//g' > "${out}"/"${B}"/"${B}"_metadata  
-					sed -i '1s/^/Sample_name\tRunID\tSampleID\n/' "${out}"/"${B}"/"${B}"_metadata
-
-					rm -rf "${out}"/"${B}"/"${B}"_tmp44
-					rm -rf "${out}"/"${B}"/"${B}"_series_matrix.txt
-					done
-	fi
-fi	
-
-## generating summary report	
-	echo "summary report:"
-	echo ""
-	mapfile lines < list1
-	
-	for idx in "${!lines[@]}";do
-
-				B=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $2}')
-				X=$(echo "${B}" | rev | cut -c4- | rev)
-				y=$(echo "${X}""nnn")
-				l="https://ftp.ncbi.nlm.nih.gov/geo/series/"${y}"/"${B}"/matrix/"${B}"_series_matrix.txt.gz"
-				mkdir "${out}"/"${B}" 
-				wget -q -P "${out}"/"${B}" ""${l}""
-				gunzip "${out}"/"${B}"/"${B}"_series_matrix.txt.gz
-				D=$(cat "${out}"/"${B}"/"${B}"_series_matrix.txt | grep '^!Series_overall_design' | sed 's/!Series_overall_design//g' | sed 's/^[ \t]*//' | sed 's/"//g')
-				C=$(printf "%5d %s" $((idx+1)) "${lines[idx]}"| awk '{print $1}')
-				esearch -db gds -query "${B}" | efetch | grep '^1\.\|^2\.\|Platform:' | grep -v "Series:" | sed 's/2\. /Type: /' | sed 's/1\. /Description: /' > tmp
-				echo "${C}".  "${B}"> tmp1
-				sed -i 's/^[ \t]*//' tmp1
-				echo "Overall experiment desgin"":" "${D}" > tmp2
-				cat tmp | grep "Description: " > tmp3
-				cat tmp | grep "Type: " > tmp4
-				cat tmp | grep -Eo '[0-9]{1,10} Samples' | sed 's/^[ \t]*//' > tmp5
-				echo "##############################################" > tmp6
-				cat tmp1 tmp2 tmp3 tmp4 tmp5 tmp6
-				rm tmp1
-				rm tmp2
-				rm tmp3
-				rm tmp4
-				rm tmp5
-				rm tmp6
-				rm tmp
-				rm -rf "${out}"/"${B}"/"${B}"_series_matrix.txt
-
-	done
-	
-	
-	echo "##############################################" 
-	echo ""
-	echo "##############################################" 
-	echo "${ID[@]}" "specified to download"
-	echo "##############################################" 
-	echo ""
+    echo ""
+    echo "##############################################"
+    echo "$(cat list) specified to download"
+    echo "##############################################"
+    echo ""
 fi
 
-## selecting specefic accession number(s) to download 
+## selecting specific accession number(s) to download 
 if [[ -v down ]];
 	then
 		if [[ $down == '1' ]];
 		then
-			echo "Enter the number of accession codes that you want to downoad: "  
+			echo "Enter the number of accession codes that you want to download: "  
 			read n
 			i=1 
 			while [[ $i -le $n ]]
@@ -1819,10 +1239,8 @@ if [[ -s list1 ]]; then
     echo "$new_list" | sort -u >list1
 fi
 
-echo "feching specified dataset(s) from the database: "
-echo ""
-echo -ne '>>>                       [10%]\r'
-sleep 1
+
+phase 1 6 "Resolving accessions to runs..."
 
 ## Resolve study/sample/GEO accessions to run accessions before download
 if [[ -s list ]]; then
@@ -1883,37 +1301,32 @@ if [[ -s list ]]; then
     echo ""
 fi
 
+phase 2 6 "Fetching ENA file records..."
+
 ## Per-accession: fetch ENA filereport TSV (replaces ffq --ftp)
+fetch_total=$(wc -l <list)
+fetch_i=0
 for j in $(cat list); do
+    fetch_i=$((fetch_i + 1))
     mkdir -p "${out}/$j"
 
     if ! fetch_ena_filereport "$j" "${out}/$j/check$j.tsv"; then
-        echo "No sample found for $j. Either the provided $j is invalid or raw data was not provided for this record"
+        substep "$fetch_i" "$fetch_total" "$j" "no record found"
         cat list | grep -v "$j" | sort | uniq > tmp && mv tmp list
         cp list list1
         rm -rf "${out}/$j" 2>/dev/null
         continue
     fi
+    substep "$fetch_i" "$fetch_total" "$j" "done"
 done
-sleep 1
-echo -ne '>>>>>>>                   [40%]\r'
-
-sleep 1
-echo -ne '>>>>>>>>>>>>>>>>>>>>>>>>>>[100%]\r'
-echo -ne '\n'
 
 ## search and download processed data (-n 1)
-## ENA's filereport doesn't expose processed data; this branch is currently a no-op
-## and is kept for backward compatibility. Real processed-data support requires
-## the GEO supplementary section (separate from the supp_urls flow above).
 if [[ -v processed && "$processed" == '1' ]]; then
     echo "WARNING: -n 1 (processed data download) is not currently supported via ENA." >&2
     echo "         Use -s 1 to fetch supplementary files from the article instead." >&2
 fi
 
-## check the total disk space
-echo ""
-echo "local disk memory size checking: "
+phase 3 6 "Disk space check..."
 echo ""
 
 for j in $(cat list); do
@@ -1927,7 +1340,7 @@ for j in $(cat list); do
     if (( $(echo "${Dirsize} > ${URLsize}" | bc -l) )); then
         echo
         echo ------------------------------------------------------------------
-        echo there is "${Dirsize}" GB space avialable in "${out}"
+        echo there is "${Dirsize}" GB space available in "${out}"
         echo "$j" size is "${URLsize}" GB
         echo There is adequate space in "${out}" to download all specified files.
         echo ------------------------------------------------------------------
@@ -1935,11 +1348,11 @@ for j in $(cat list); do
     else
         echo
         echo ---------------------------------------------------------------------------------------------------
-        echo there is "${Dirsize}" GB space avialable in "${out}"
+        echo there is "${Dirsize}" GB space available in "${out}"
         echo "total size of sequence data for below accession number(s)"
         echo "$(cat list)"
         echo is "${URLsize}" GB
-        echo  "${out}" does not have enough space for all files you aim to download. Please change the directroy.
+        echo  "${out}" does not have enough space for all files you aim to download. Please change the directory.
         echo ---------------------------------------------------------------------------------------------------
         echo
         rm -f list list1 PMCIDlist
@@ -1947,18 +1360,18 @@ for j in $(cat list); do
     fi
 done
 
-## extract URLs by file type, rewrite ftp:// to era-fasp@ for ascp
-## TSV columns: 1=run_accession 2=fastq_ftp 3=fastq_md5 4=fastq_bytes
-##              5=sra_ftp 6=sra_md5 7=sra_bytes 8=submitted_ftp 9=submitted_md5 10=submitted_bytes
+phase 4 6 "Building Aspera URL list..."
+
 extract_urls_for_type() {
     local tsv="$1"
     local want_type="$2"
     local col=""
 
     case "$want_type" in
-        fastq)              col=2 ;;
-        bam|fasta|vcf)      col=8 ;;  # bam/fasta/vcf live in submitted_ftp
-        sra|"")             col=2 ;;  # default to fastq, fall back to sra/submitted
+        fastq)              col=2
+;;
+        bam|fasta|vcf)      col=8 ;;
+        sra|"")             col=2 ;;
         *)                  col=2 ;;
     esac
 
@@ -1984,9 +1397,7 @@ if [[ -v type && -n "$type" ]]; then
             ;;
     esac
 else
-    echo "KARAJ is downloading files corresponding to the selected accession number(s)"
     for j in $(cat list1); do
-        # No -t flag: prefer fastq, fall back to submitted (bam/fasta/vcf), then sra
         urls=$(extract_urls_for_type "${out}/$j/check$j.tsv" fastq)
         [[ -z "$urls" ]] && urls=$(extract_urls_for_type "${out}/$j/check$j.tsv" bam)
         [[ -z "$urls" ]] && urls=$(awk -F'\t' 'NR>1 && $5 != "" {n=split($5, u, ";"); for (k=1; k<=n; k++) print u[k]}' "${out}/$j/check$j.tsv" \
@@ -1994,7 +1405,7 @@ else
         echo "$urls" >"${out}/$j/urls$j.txt"
     done
 fi
-## download sequence data using IBM Aspera SDK in parallel mode
+phase 5 6 "Downloading via Aspera..."
 
 ASCP_BIN="$HOME/.aspera/sdk/ascp"
 ASCP_KEY="$HOME/.aspera/sdk/etc/asperaweb_id_dsa.openssh"
@@ -2036,7 +1447,6 @@ if [[ -v core && -n "$core" ]]; then
 else
     k=$(nproc)
     k=$((k - 1))
-
     if [[ "$k" -lt 1 ]]; then
         k=1
     fi
@@ -2045,47 +1455,121 @@ fi
 echo "${k} cores are using"
 echo "Using ascp: $ASCP_BIN"
 echo "Using Aspera key: $ASCP_KEY"
+echo ""
 
 SECONDS=0
 start=$SECONDS
 
-while read -r w; do
+dl_total=$(grep -c . list1)
+dl_i=0
+
+while IFS= read -r w; do
     [[ -z "$w" ]] && continue
 
-    echo "KARAJ is downloading ${w}"
+    dl_i=$((dl_i + 1))
 
     URL_FILE="${out}/${w}/urls${w}.txt"
 
     if [[ ! -f "$URL_FILE" ]]; then
-        echo "WARNING: $URL_FILE was not found. Skipping ${w}."
+        substep "$dl_i" "$dl_total" "$w" "URL list missing — skipping"
         continue
     fi
 
     if [[ ! -s "$URL_FILE" ]]; then
-        echo "WARNING: $URL_FILE is empty. Skipping ${w}."
+        substep "$dl_i" "$dl_total" "$w" "URL list empty — skipping"
         continue
     fi
 
-# #    parallel -j "$k" "$ASCP_BIN" -QT -l 300m --retry-timeout=1800 \
-# 	parallel -j "$k" "$ASCP_BIN" -L- -T -l 300m --retry-timeout=1800 \
-# #        -P33001 -i "$ASCP_KEY" -q {} "${out}/${w}" \
-#         -P33001 -i "$ASCP_KEY" {} "${out}/${w}" \
-#         < "$URL_FILE"
+    substep "$dl_i" "$dl_total" "$w" "downloading"
 
-	parallel -j "$k" -- "$ASCP_BIN" -QT -l  300m --retry-timeout=1800 -P33001 -i "$ASCP_KEY" -q {} "${out}/${w}" < "$URL_FILE"
+    parallel -j "$k" -- "$ASCP_BIN" -QT -l 300m --retry-timeout=1800 \
+        -P33001 -i "$ASCP_KEY" {} "${out}/${w}" \
+        < "$URL_FILE"
 
     if [[ $? -ne 0 ]]; then
-        echo "ERROR: downloading ${w} failed."
+        substep "$dl_i" "$dl_total" "$w" "FAILED"
         exit 1
     fi
 
-    echo "downloading ${w} is completed"
+    substep "$dl_i" "$dl_total" "$w" "completed"
+done < list1
 
-    rm "${out}/${w}/urls${w}.txt" 2>/dev/null
-    rm "${out}/${w}/check${w}.txt" 2>/dev/null
-    rm "${out}/${w}/proccessed_url${w}.txt" 2>/dev/null
+echo ""
+
+## verify MD5 checksums for each downloaded file
+phase 6 6 "Verifying MD5 checksums..."
+
+vf_total=$(grep -c . list1)
+vf_i=0
+
+while IFS= read -r w; do
+    [[ -z "$w" ]] && continue
+
+    vf_i=$((vf_i + 1))
+    tsv="${out}/${w}/check${w}.tsv"
+
+    if [[ ! -s "$tsv" ]]; then
+        substep "$vf_i" "$vf_total" "$w" "no TSV — skipping verification"
+        continue
+    fi
+
+    ## Check fastq, sra, and submitted columns for MD5+filename pairs
+    ## Columns: 2=fastq_ftp 3=fastq_md5  5=sra_ftp 6=sra_md5  8=submitted_ftp 9=submitted_md5
+    bad_count=0
+    file_count=0
+
+    while IFS=$'\t' read -r ftp_url expected_md5; do
+        [[ -z "$ftp_url" || -z "$expected_md5" ]] && continue
+
+        ## Each cell may contain multiple semicolon-separated entries
+        IFS=';' read -ra urls  <<< "$ftp_url"
+        IFS=';' read -ra md5s  <<< "$expected_md5"
+
+        for idx in "${!urls[@]}"; do
+            file_url="${urls[$idx]}"
+            file_md5="${md5s[$idx]:-}"
+            [[ -z "$file_url" || -z "$file_md5" ]] && continue
+
+            file_name=$(basename "$file_url")
+            file_path="${out}/${w}/${file_name}"
+
+            file_count=$((file_count + 1))
+
+            if [[ ! -f "$file_path" ]]; then
+                continue
+            fi
+
+            if ! verify_md5 "$file_path" "$file_md5"; then
+                echo "    MD5 MISMATCH: ${file_name} — deleting"
+                rm -f "$file_path"
+                bad_count=$((bad_count + 1))
+            fi
+        done
+    done < <(awk -F'\t' 'NR>1 {
+        if ($2 != "" && $3 != "") print $2 "\t" $3
+        if ($5 != "" && $6 != "") print $5 "\t" $6
+        if ($8 != "" && $9 != "") print $8 "\t" $9
+    }' "$tsv")
+
+    if (( bad_count == 0 )); then
+        if (( file_count > 0 )); then
+            substep "$vf_i" "$vf_total" "$w" "verified ($file_count file(s))"
+        else
+            substep "$vf_i" "$vf_total" "$w" "no files to verify"
+        fi
+    else
+        substep "$vf_i" "$vf_total" "$w" "$bad_count of $file_count file(s) failed verification"
+    fi
+
+    ## Cleanup the TSV and any leftover working files
+    rm -f "${out}/${w}/urls${w}.txt"
+    rm -f "${out}/${w}/check${w}.tsv"
+    rm -f "${out}/${w}/check${w}.txt"
+    rm -f "${out}/${w}/proccessed_url${w}.txt"
 
 done < list1
+
+echo ""
 
 duration=$(( SECONDS - start ))
 echo "This run took $duration seconds"
@@ -2096,136 +1580,6 @@ rm -rf PMCIDlist 2>/dev/null
 rm -rf supp1 2>/dev/null
 rm -rf lines 2>/dev/null
 rm -rf tmp 2>/dev/null
-
-# ## download sequence data using Aspera in parallel mode
-
-# ASCP_BIN="$HOME/.aspera/connect/bin/ascp"
-# ASCP_KEY="$HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh"
-
-# if [[ ! -x "$ASCP_BIN" ]]; then
-#     ASCP_BIN="$HOME/.aspera/sdk/ascp"
-# fi
-
-# if [[ ! -x "$ASCP_BIN" ]]; then
-#     ASCP_BIN="$(command -v ascp 2>/dev/null)"
-# fi
-
-# if [[ -z "$ASCP_BIN" || ! -x "$ASCP_BIN" ]]; then
-#     echo "ERROR: ascp was not found. Please install Aspera or fix the ascp path."
-#     exit 1
-# fi
-
-# if [[ ! -f "$ASCP_KEY" ]]; then
-#     ASCP_KEY=$(find "$HOME/.aspera" -type f -name "asperaweb_id_dsa.openssh" 2>/dev/null | head -n 1)
-# fi
-
-# if [[ -z "$ASCP_KEY" || ! -f "$ASCP_KEY" ]]; then
-#     echo "ERROR: Aspera key file asperaweb_id_dsa.openssh was not found."
-#     echo "Expected location: $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh"
-#     exit 1
-# fi
-
-# if ! command -v parallel >/dev/null 2>&1; then
-#     echo "ERROR: GNU parallel is not installed."
-#     echo "Install it with: sudo apt install parallel -y"
-#     exit 1
-# fi
-
-# if [[ -v core && -n "$core" ]]; then
-#     k="$core"
-# else
-#     k=$(nproc)
-#     k=$((k - 1))
-
-#     if [[ "$k" -lt 1 ]]; then
-#         k=1
-#     fi
-# fi
-
-# echo "${k} cores are using"
-
-# SECONDS=0
-# start=$SECONDS
-
-# while read -r w; do
-#     [[ -z "$w" ]] && continue
-
-#     echo "KARAJ is downloading ${w}"
-
-#     if [[ ! -f "${out}/${w}/urls${w}.txt" ]]; then
-#         echo "WARNING: ${out}/${w}/urls${w}.txt was not found. Skipping ${w}."
-#         continue
-#     fi
-
-#     parallel -j "$k" "$ASCP_BIN" -QT -l 300m --retry-timeout=1800 \
-#         -P33001 -i "$ASCP_KEY" -q {} "${out}/${w}" \
-#         < "${out}/${w}/urls${w}.txt"
-
-#     echo "downloading ${w} is completed"
-
-#     rm "${out}/${w}/urls${w}.txt" 2>/dev/null
-#     rm "${out}/${w}/check${w}.txt" 2>/dev/null
-#     rm "${out}/${w}/proccessed_url${w}.txt" 2>/dev/null
-
-# done < list1
-
-# duration=$(( SECONDS - start ))
-# echo "This run took $duration seconds"
-
-# rm -rf list 2>/dev/null
-# rm -rf list1 2>/dev/null
-# rm -rf PMCIDlist 2>/dev/null
-# rm -rf supp1 2>/dev/null
-# rm -rf lines 2>/dev/null
-# rm -rf tmp 2>/dev/null
-
-# if [[ -v core ]];
-# 	then
-# 		k=$core
-# 		echo "${k}" "cores are using"
-# 		SECONDS=0
-# 		start=$SECONDS
-		
-# 			for w in $(cat list1);do
-			
-# 				echo "KARAJ is downloading" "${w}" 
-# 				cat "${out}"/$w/urls$w.txt | parallel -j "${k}" ~/.aspera/connect/bin/ascp -QT -l 300m --retry-timeout=1800 \
-# 				-P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh -q {} "${out}"/$w
-# 				echo "downloading" "${w}" "is completed"
-# 				duration=$(( SECONDS - start ))
-# 				echo "This run took $duration seconds"
-# 				rm "${out}"/$w/urls$w.txt  2> /dev/null
-# 				rm "${out}"/$w/check$w.txt  2> /dev/null
-# 				rm "${out}"/$w/proccessed_url$w.txt  2> /dev/null
-# 			done
-# 	  else	
-# 		th=$(lscpu | egrep 'Model name|Socket|Thread|NUMA|CPU\(s\)' | grep "^CPU(s):" | sed 's/CPU(s)://g' | sed 's/^[ \t]*//'| bc ) 
-# 		k=$(expr "${th}" - 1)
-# 		echo "${k}" "cores are using"
-# 		SECONDS=0
-# 		start=$SECONDS
-		
-# 			for w in $(cat list1);do
-			
-# 				echo "KARAJ is downloading" "${w}" 
-# 				cat "${out}"/$w/urls$w.txt | parallel -j "${k}" ~/.aspera/connect/bin/ascp -QT -l 300m --retry-timeout=1800 \
-# 				-P33001 -i $HOME/.aspera/connect/etc/asperaweb_id_dsa.openssh -q {} "${out}"/$w
-# 				echo "downloading" "${w}" "is completed"
-# 				rm "${out}"/$w/urls$w.txt  2> /dev/null
-# 				rm "${out}"/$w/check$w.txt  2> /dev/null
-# 				rm "${out}"/$w/proccessed_url$w.txt  2> /dev/null
-# 			done
-		
-# 		duration=$(( SECONDS - start ))
-# 		echo "This run took $duration seconds"
-# fi
-	
-# rm -rf list 2> /dev/null
-# rm -rf list1 2> /dev/null
-# rm -rf PMCIDlist 2> /dev/null
-# rm -rf supp1 2> /dev/null
-# rm -rf lines 2> /dev/null
-# rm -rf tmp 2> /dev/null
 
 #######  END  #######
 
